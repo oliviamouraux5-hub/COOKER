@@ -1400,73 +1400,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
-                {/* Groceries Shopping List Sidebar Drawer */}
-                <div className="col-span-full mt-6">
-                  <Card className="border-none shadow-premium bg-gradient-to-br from-orange-500/10 via-white to-primary/5 p-8 rounded-[3.5rem] space-y-6">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 rounded-2xl bg-orange-500 flex items-center justify-center text-white shadow-lg shadow-orange-500/20">
-                          <ShoppingCart className="w-6 h-6" />
-                        </div>
-                        <div>
-                          <h3 className="font-black text-2xl text-foreground">Groceries Restock List</h3>
-                          <p className="text-xs text-muted-foreground font-semibold">Ingredients tagged for your next shopping trip</p>
-                        </div>
-                      </div>
-                      {fridgeItems.filter(i => i.needs_restock).length > 0 && (
-                        <Button
-                          onClick={() => {
-                            setActiveTab('nearby')
-                            toast.info("Navigated to Nearby Shops map view! 🛍️")
-                          }}
-                          className="bg-orange-500 hover:bg-orange-600 text-white rounded-2xl px-6 py-4 text-xs font-black uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-orange-500/10 self-start sm:self-auto"
-                        >
-                          <MapPin className="w-4 h-4" />
-                          Find Nearby Grocery Shops
-                        </Button>
-                      )}
-                    </div>
 
-                    <div className="bg-white/70 backdrop-blur-md rounded-[2.5rem] p-6 border border-orange-500/10 min-h-[120px] flex items-center justify-center">
-                      {fridgeItems.filter(i => i.needs_restock).length > 0 ? (
-                        <div className="w-full grid sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-                          {fridgeItems.filter(i => i.needs_restock).map(item => (
-                            <div
-                              key={item.id}
-                              className="group flex items-center justify-between p-4 bg-muted/30 border border-muted-foreground/10 rounded-2xl hover:border-orange-300 hover:bg-orange-500/5 transition-all duration-300"
-                            >
-                              <div className="flex items-center gap-3">
-                                <span className="text-lg">
-                                  {item.category === 'Produce' ? '🥬' : item.category === 'Proteins' ? '🍖' : item.category === 'Dairy' ? '🥛' : '🥫'}
-                                </span>
-                                <div>
-                                  <span className="block font-black text-xs text-foreground group-hover:text-orange-900 transition-colors leading-tight">{item.name}</span>
-                                  <span className="block text-[9px] text-muted-foreground/60 font-extrabold group-hover:text-orange-600/70 transition-colors mt-0.5">{item.quantity || 'to taste'}</span>
-                                </div>
-                              </div>
-                              <button
-                                type="button"
-                                onClick={() => handleToggleRestock(item.id, item.needs_restock, item.name)}
-                                className="p-2 rounded-full hover:bg-red-500 hover:text-white transition-colors text-muted-foreground/50"
-                                title="Remove from groceries list"
-                              >
-                                <svg className="w-4 h-4 stroke-[3]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                  <line x1="18" y1="6" x2="6" y2="18" />
-                                  <line x1="6" y1="6" x2="18" y2="18" />
-                                </svg>
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="flex flex-col items-center justify-center p-6 text-center text-muted-foreground">
-                          <span className="text-3xl mb-2">🎉</span>
-                          <p className="text-xs font-black">All stocked up! Your fridge is full of cooking fuel.</p>
-                        </div>
-                      )}
-                    </div>
-                  </Card>
-                </div>
               </div>
             ) : activeTab === 'nearby' ? (
               <div className="lg:col-span-12">
