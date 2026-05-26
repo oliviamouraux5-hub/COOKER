@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Check, Loader2, MapPin, Navigation, ShoppingBasket, Store, Trash2, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
+import { getFridgeItems, type FridgeItem } from '@/lib/actions/fridge'
 
 const MapComponent = dynamic(() => import('./MapComponent'), { 
   ssr: false,
@@ -42,29 +43,92 @@ export default function ShoppingListModal({ isOpen, onClose, items }: { isOpen: 
   const [availableWords, setAvailableWords] = useState<string[]>([])
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
-    if (!isOpen) return
-    const savedIngredients = localStorage.getItem('cooker_ingredients') || ''
-    const savedPantry = localStorage.getItem('cooker_pantry') || ''
-    
-    // Combine them into a single pool of lowercased words
-    const ingredientsWords = savedIngredients
-      .toLowerCase()
-      .split(/[\s,]+/)
-      .filter(w => w.length > 2)
+    async function loadAvailableIngredients() {
+      if (typeof window === 'undefined') return
+      if (!isOpen) return
       
-    const pantryWords = savedPantry
-      .toLowerCase()
-      .split(/[\s,]+/)
-      .filter(w => w.length > 2)
+      const isDemo = document.cookie.includes('cooker_session=demo')
+      let items: FridgeItem[] = []
+      
+      if (isDemo) {
+        const local = localStorage.getItem('cooker_fridge_inventory_v2') || '[]'
+        items = JSON.parse(local)
+      } else {
+        try {
+          const res = await getFridgeItems()
+          if (res.migrationNeeded || !res.items) {
+            const local = localStorage.getItem('cooker_fridge_inventory_v2') || '[]'
+            items = JSON.parse(local)
+          } else {
+            items = res.items
+          }
+        } catch {
+          const local = localStorage.getItem('cooker_fridge_inventory_v2') || '[]'
+          items = JSON.parse(local)
+        }
+      }
 
-    setAvailableWords([...ingredientsWords, ...pantryWords])
+      // Map item names to lowercase pool of phrases
+      const words = items.map(item => item.name.toLowerCase()).filter(Boolean)
+
+      // 1. Append checked pantry ingredients
+      try {
+        const pantryLocal = localStorage.getItem('cooker_pantry')
+        if (pantryLocal) {
+          const pantryObj = JSON.parse(pantryLocal)
+          Object.keys(pantryObj).forEach(key => {
+            if (pantryObj[key]) {
+              words.push(key.toLowerCase())
+            }
+          })
+        }
+      } catch (err) {
+        console.error("Failed to parse local pantry stock:", err)
+      }
+
+      // 2. Append custom staples
+      try {
+        const staplesLocal = localStorage.getItem('cooker_custom_staples')
+        if (staplesLocal) {
+          const staplesArr = JSON.parse(staplesLocal)
+          if (Array.isArray(staplesArr)) {
+            staplesArr.forEach((s: string) => {
+              words.push(s.toLowerCase())
+            })
+          }
+        }
+      } catch (err) {
+        console.error("Failed to parse custom staples:", err)
+      }
+
+      // 3. Append discovery search box ingredients (typed search ingredients)
+      try {
+        const typedLocal = localStorage.getItem('cooker_ingredients')
+        if (typedLocal) {
+          typedLocal.split(',').forEach((ing: string) => {
+            const clean = ing.trim().toLowerCase()
+            if (clean) words.push(clean)
+          })
+        }
+      } catch (err) {
+        console.error("Failed to parse typed ingredients:", err)
+      }
+
+      setAvailableWords(Array.from(new Set(words)))
+    }
+
+    loadAvailableIngredients()
   }, [isOpen])
 
   const isMissing = (item: string) => {
-    if (availableWords.length === 0) return false // fallback if not loaded yet
+    if (availableWords.length === 0) return true // assume missing until loaded to avoid race condition!
     const itemLower = item.toLowerCase()
-    const matchesAny = availableWords.some(word => itemLower.includes(word) || word.includes(itemLower))
+    
+    const matchesAny = availableWords.some(word => {
+      const cleanWord = word.trim()
+      if (!cleanWord) return false
+      return itemLower.includes(cleanWord) || cleanWord.includes(itemLower)
+    })
     return !matchesAny
   }
 
