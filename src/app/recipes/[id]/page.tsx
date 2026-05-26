@@ -13,6 +13,35 @@ import ShoppingListModal from '@/components/shopping/ShoppingListModal'
 import { toast } from 'sonner'
 import { getFridgeItems, type FridgeItem } from '@/lib/actions/fridge'
 
+const getRealisticFoodFallback = (title: string): string => {
+  const t = title.toLowerCase();
+  if (t.includes('pasta') || t.includes('noodle') || t.includes('spaghetti') || t.includes('lasagna')) {
+    return "https://images.unsplash.com/photo-1546549032-9571cd6b27df?auto=format&fit=crop&q=80&w=1200";
+  }
+  if (t.includes('salad') || t.includes('lettuce') || t.includes('avocado') || t.includes('green') || t.includes('vegetable')) {
+    return "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=1200";
+  }
+  if (t.includes('chicken') || t.includes('poultry') || t.includes('turkey') || t.includes('wings')) {
+    return "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&q=80&w=1200";
+  }
+  if (t.includes('salmon') || t.includes('fish') || t.includes('tuna') || t.includes('shrimp') || t.includes('seafood')) {
+    return "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&q=80&w=1200";
+  }
+  if (t.includes('steak') || t.includes('beef') || t.includes('ribeye') || t.includes('pork') || t.includes('lamb') || t.includes('meat')) {
+    return "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=1200";
+  }
+  if (t.includes('soup') || t.includes('stew') || t.includes('broth') || t.includes('ramen')) {
+    return "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&q=80&w=1200";
+  }
+  if (t.includes('dessert') || t.includes('cake') || t.includes('sweet') || t.includes('cookie') || t.includes('chocolate') || t.includes('pastry')) {
+    return "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=1200";
+  }
+  if (t.includes('egg') || t.includes('omelet') || t.includes('scramble') || t.includes('breakfast')) {
+    return "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&q=80&w=1200";
+  }
+  return "https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&q=80&w=1200";
+}
+
 export default function RecipeDetailsPage() {
   const params = useParams()
   const router = useRouter()
@@ -387,7 +416,10 @@ export default function RecipeDetailsPage() {
             <Card className="border-none shadow-premium bg-white p-4 rounded-[3rem] overflow-hidden">
               <div className="h-[400px] relative">
                 <img 
-                  src={recipe.image_url || "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&q=80&w=1200"} 
+                  src={recipe.image_url || getRealisticFoodFallback(recipe.title)} 
+                  onError={(e) => {
+                    e.currentTarget.src = getRealisticFoodFallback(recipe.title);
+                  }}
                   className="w-full h-full object-cover"
                   alt={recipe.title}
                 />
