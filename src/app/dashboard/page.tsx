@@ -1034,21 +1034,6 @@ export default function DashboardPage() {
           </div>
         </div>
         <div className="flex items-center gap-1.5 opacity-60 group-hover:opacity-100 transition-opacity">
-          {/* Restock Toggle Button */}
-          <button
-            type="button"
-            onClick={() => handleToggleRestock(item.id, isNeedRestock, item.name)}
-            className={cn(
-              "p-2 rounded-xl transition-colors",
-              isNeedRestock 
-                ? "bg-red-500 text-white hover:bg-red-600" 
-                : "bg-muted text-muted-foreground hover:bg-red-500 hover:text-white"
-            )}
-            title={isNeedRestock ? "Remove from Shopping List" : "Add to Shopping List"}
-          >
-            <ShoppingCart className="w-3.5 h-3.5" />
-          </button>
-          
           {/* Delete Item Button */}
           <button
             type="button"
@@ -2088,8 +2073,8 @@ export default function DashboardPage() {
                 <div className="grid grid-cols-2 gap-3">
                   {([
                     { key: 'Produce',  emoji: '🥬', label: 'Vegetables', desc: 'Fruits & greens',    bg: 'hover:bg-emerald-50 hover:border-emerald-200' },
-                    { key: 'Proteins', emoji: '🍖', label: 'Meats',      desc: 'Fish, poultry & more', bg: 'hover:bg-rose-50 hover:border-rose-200'    },
-                    { key: 'Dairy',    emoji: '🥛', label: 'Dairy',      desc: 'Milk, cheese, eggs',   bg: 'hover:bg-sky-50 hover:border-sky-200'       },
+                    { key: 'Proteins', emoji: '🍖', label: 'Meats',      desc: 'Fish, poultry, eggs', bg: 'hover:bg-rose-50 hover:border-rose-200'    },
+                    { key: 'Dairy',    emoji: '🥛', label: 'Dairy',      desc: 'Milk, cheese & more',   bg: 'hover:bg-sky-50 hover:border-sky-200'       },
                     { key: 'Pantry',   emoji: '🥫', label: 'Pantry',     desc: 'Grains, oils & more',  bg: 'hover:bg-amber-50 hover:border-amber-200'   },
                   ] as const).map(({ key, emoji, label, desc, bg }) => (
                     <button
