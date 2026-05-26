@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { ArrowRight, Camera, ChefHat, ChevronRight, ChevronDown, Heart, History, Loader2, MapPin, Plus, Search, Share2, Sparkles, UtensilsCrossed, Trash2, ShoppingCart, Upload, Calendar, Image as ImageIcon } from 'lucide-react'
+import { ArrowRight, Camera, ChefHat, ChevronRight, ChevronDown, Heart, History, Loader2, MapPin, Plus, Search, Share2, Sparkles, UtensilsCrossed, Trash2, ShoppingCart, Upload, Calendar, Image as ImageIcon, LogOut } from 'lucide-react'
 import { toast } from 'sonner'
 import NearbyShopsDashboard from '@/components/shopping/NearbyShopsDashboard'
 import ChefLoadingAnimation from '@/components/ui/ChefLoadingAnimation'
@@ -307,6 +307,19 @@ export default function DashboardPage() {
 
     loadFridge()
   }, [])
+
+  const handleLogout = async () => {
+    try {
+      document.cookie = 'cooker_session=; Max-Age=0; path=/;'
+      localStorage.removeItem('cooker_staged_profile')
+      await supabase.auth.signOut()
+      toast.success("Logged out successfully! See you soon, Chef! 👋")
+      router.push('/login')
+    } catch (err) {
+      console.error("Logout caught error:", err)
+      router.push('/login')
+    }
+  }
 
   const handleAddFridgeItem = async () => {
     const name = fridgeInput.trim()
@@ -1139,27 +1152,38 @@ export default function DashboardPage() {
               </Button>
             </nav>
             
-            <Link 
-              href="/profile/setup"
-              className={cn(
-                buttonVariants({ variant: "ghost" }),
-                "rounded-full p-0 bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all duration-300 shadow-premium cursor-pointer border-2 border-primary/20 hover:scale-105 flex items-center justify-center w-16 h-16 overflow-hidden"
-              )}
-              title={userName ? `Logged in as Chef ${userName} - Edit Profile & Preferences` : "Edit Profile & Preferences"}
-            >
-              {userAvatar ? (
-                userAvatar.startsWith('data:image') || userAvatar.startsWith('http') ? (
-                  <img src={userAvatar} alt="Profile" className="w-full h-full object-cover" />
+             <div className="flex items-center gap-3">
+              <Link 
+                href="/profile/setup"
+                className={cn(
+                  buttonVariants({ variant: "ghost" }),
+                  "rounded-full p-0 bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all duration-300 shadow-premium cursor-pointer border-2 border-primary/20 hover:scale-105 flex items-center justify-center w-16 h-16 overflow-hidden"
+                )}
+                title={userName ? `Logged in as Chef ${userName} - Edit Profile & Preferences` : "Edit Profile & Preferences"}
+              >
+                {userAvatar ? (
+                  userAvatar.startsWith('data:image') || userAvatar.startsWith('http') ? (
+                    <img src={userAvatar} alt="Profile" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-3xl select-none">{userAvatar}</span>
+                  )
                 ) : (
-                  <span className="text-3xl select-none">{userAvatar}</span>
-                )
-              ) : (
-                <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-                  <circle cx="12" cy="7" r="4" />
-                </svg>
-              )}
-            </Link>
+                  <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                )}
+              </Link>
+              
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="rounded-full bg-red-50 hover:bg-red-500 text-red-500 hover:text-white transition-all duration-300 shadow-premium border-2 border-red-100 hover:border-red-500 hover:scale-105 flex items-center justify-center w-16 h-16 cursor-pointer"
+                title="Log Out / Sign Out"
+              >
+                <LogOut className="w-5.5 h-5.5" />
+              </button>
+             </div>
           </div>
         </header>
 
