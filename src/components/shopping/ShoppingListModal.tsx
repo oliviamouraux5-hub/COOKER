@@ -265,8 +265,8 @@ export default function ShoppingListModal({ isOpen, onClose, items }: { isOpen: 
   const handleManualSearch = async (city: string) => {
     setIsFetchingStores(true)
     try {
-      // Use Nominatim for free geocoding
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city)}`)
+      // Use Nominatim for free geocoding with Portugal country code restriction
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city)}&countrycodes=pt`)
       if (!response.ok) throw new Error(`HTTP error ${response.status}`)
       const data = await response.json()
       if (data && data.length > 0) {
@@ -639,8 +639,7 @@ export default function ShoppingListModal({ isOpen, onClose, items }: { isOpen: 
                     <div 
                       key={i} 
                       onClick={() => {
-                        const originStr = userLocation ? `&origin=${userLocation.lat},${userLocation.lng}` : '';
-                        window.open(`https://www.google.com/maps/dir/?api=1${originStr}&destination=${store.lat},${store.lng}&travelmode=driving`, '_blank')
+                        window.open(`https://www.google.com/maps/dir/?api=1&destination=${store.lat},${store.lng}&travelmode=driving`, '_blank')
                       }}
                       className="flex items-center justify-between p-4 bg-muted/20 rounded-2xl border-2 border-transparent hover:border-primary/10 hover:bg-white transition-all group cursor-pointer shadow-sm"
                     >

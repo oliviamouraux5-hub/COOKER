@@ -136,7 +136,7 @@ export default function NearbyShopsDashboard() {
   const handleManualSearch = async (city: string) => {
     setIsFetchingStores(true)
     try {
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city)}`)
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city)}&countrycodes=pt`)
       if (!response.ok) throw new Error(`HTTP error ${response.status}`)
       const data = await response.json()
       if (data?.[0]) {
@@ -263,8 +263,7 @@ export default function NearbyShopsDashboard() {
                   key={i} 
                   className="group border-none shadow-premium hover:shadow-2xl transition-all duration-500 rounded-[2rem] overflow-hidden cursor-pointer" 
                   onClick={() => {
-                    const originStr = userLocation ? `&origin=${userLocation.lat},${userLocation.lng}` : '';
-                    window.open(`https://www.google.com/maps/dir/?api=1${originStr}&destination=${store.lat},${store.lng}&travelmode=driving`, '_blank')
+                    window.open(`https://www.google.com/maps/dir/?api=1&destination=${store.lat},${store.lng}&travelmode=driving`, '_blank')
                   }}
                 >
                   <div className="p-6 flex items-center justify-between bg-white group-hover:bg-primary/5 transition-colors">
