@@ -198,6 +198,13 @@ export default function DashboardPage() {
       if (isDemo) {
         // Load from Local Storage fallback
         try {
+          const localProfile = localStorage.getItem('cooker_demo_profile')
+          if (localProfile) {
+            const parsed = JSON.parse(localProfile)
+            setUserName(parsed.full_name || '')
+            setUserAvatar(parsed.avatar_url || '🧑‍🍳')
+          }
+
           const localItems = localStorage.getItem('cooker_fridge_inventory_v2')
           if (localItems) {
             setFridgeItems(JSON.parse(localItems))
@@ -250,6 +257,33 @@ export default function DashboardPage() {
           try {
             const { data: { user } } = await supabase.auth.getUser()
             if (user) {
+              // Automatically sync locally staged profile to Supabase on first active session!
+              const staged = localStorage.getItem('cooker_staged_profile') || localStorage.getItem('cooker_demo_profile')
+              if (staged) {
+                try {
+                  const parsed = JSON.parse(staged)
+                  await supabase
+                    .from('profiles')
+                    .upsert({
+                      id: user.id,
+                      username: parsed.full_name || user.email?.split('@')[0],
+                      full_name: parsed.full_name,
+                      avatar_url: parsed.avatar_url,
+                      dietary_preferences: {
+                        vegan: !!parsed.dietary_preferences?.vegan,
+                        gluten_free: !!parsed.dietary_preferences?.gluten_free,
+                        vegetarian: !!parsed.dietary_preferences?.vegetarian,
+                        keto: !!parsed.dietary_preferences?.keto,
+                      },
+                      allergies: Array.isArray(parsed.allergies) ? parsed.allergies : [],
+                    })
+                  localStorage.removeItem('cooker_staged_profile')
+                  localStorage.removeItem('cooker_demo_profile')
+                } catch (syncErr) {
+                  console.error("Auto-syncing staged profile failed:", syncErr)
+                }
+              }
+
               const { data: profile } = await supabase
                 .from('profiles')
                 .select('*')
@@ -257,8 +291,8 @@ export default function DashboardPage() {
                 .single()
               
               if (profile) {
-                const name = profile.full_name || profile.dietary_preferences?.full_name_fallback || profile.username || ''
-                const avatar = profile.avatar_url || profile.dietary_preferences?.avatar_url_fallback || '🧑‍🍳'
+                const name = profile.full_name || profile.username || ''
+                const avatar = profile.avatar_url || '🧑‍🍳'
                 setUserName(name)
                 setUserAvatar(avatar)
               }

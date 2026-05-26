@@ -48,6 +48,33 @@ export default function ProfileSetupPage() {
   // Load existing profile values if logged in
   useEffect(() => {
     async function loadProfile() {
+      const isDemo = typeof document !== 'undefined' && document.cookie.includes('cooker_session=demo')
+      
+      if (isDemo) {
+        try {
+          const stored = localStorage.getItem('cooker_demo_profile')
+          if (stored) {
+            const profile = JSON.parse(stored)
+            reset({
+              full_name: profile.full_name || '',
+              avatar_url: profile.avatar_url || '🧑‍🍳',
+              dietary_preferences: {
+                vegan: !!profile.dietary_preferences?.vegan,
+                gluten_free: !!profile.dietary_preferences?.gluten_free,
+                vegetarian: !!profile.dietary_preferences?.vegetarian,
+                keto: !!profile.dietary_preferences?.keto,
+              },
+              allergies: Array.isArray(profile.allergies) ? profile.allergies : [],
+            })
+          }
+        } catch (e) {
+          console.error('Failed to load local demo profile:', e)
+        } finally {
+          setIsFetching(false)
+        }
+        return
+      }
+
       try {
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) {
@@ -123,14 +150,42 @@ export default function ProfileSetupPage() {
 
   async function onSubmit(data: ProfileFormValues) {
     setIsLoading(true)
+    const isDemo = typeof document !== 'undefined' && document.cookie.includes('cooker_session=demo')
+    
+    if (isDemo) {
+      try {
+        localStorage.setItem('cooker_demo_profile', JSON.stringify({
+          full_name: data.full_name,
+          avatar_url: data.avatar_url,
+          dietary_preferences: data.dietary_preferences,
+          allergies: data.allergies,
+        }))
+        toast.success('Local demo profile updated successfully!')
+        router.push('/dashboard')
+      } catch (e) {
+        toast.error('Failed to save demo profile')
+      } finally {
+        setIsLoading(false)
+      }
+      return
+    }
+
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
-        toast.error('User not found')
+        // Staged profile helper for new unconfirmed signups
+        localStorage.setItem('cooker_staged_profile', JSON.stringify({
+          full_name: data.full_name,
+          avatar_url: data.avatar_url,
+          dietary_preferences: data.dietary_preferences,
+          allergies: data.allergies,
+        }))
+        toast.success('Kitchen profile saved! Welcome to COOKER!')
+        router.push('/dashboard')
         return
       }
 
-      // Upsert profile data
+      // Upsert profile data using only guaranteed pre-existing columns to prevent PostgREST schema cache errors!
       const { error } = await supabase
         .from('profiles')
         .upsert({
@@ -143,29 +198,8 @@ export default function ProfileSetupPage() {
         })
 
       if (error) {
-        // If columns don't exist yet, we attempt to save to username & json metadata as a graceful fallback!
-        if (error.message.includes('column') && error.message.includes('does not exist')) {
-          const { error: fallbackError } = await supabase
-            .from('profiles')
-            .upsert({
-              id: user.id,
-              username: data.full_name || user.email?.split('@')[0],
-              dietary_preferences: {
-                ...data.dietary_preferences,
-                full_name_fallback: data.full_name,
-                avatar_url_fallback: data.avatar_url,
-              },
-              allergies: data.allergies,
-            })
-          
-          if (fallbackError) {
-            toast.error(fallbackError.message)
-            return
-          }
-        } else {
-          toast.error(error.message)
-          return
-        }
+        toast.error(error.message)
+        return
       }
 
       toast.success('Profile updated successfully!')
