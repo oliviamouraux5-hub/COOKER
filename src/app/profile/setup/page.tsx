@@ -27,14 +27,14 @@ export default function ProfileSetupPage() {
 
   const handleLogout = async () => {
     try {
-      document.cookie = 'cooker_session=; Max-Age=0; path=/;'
+      document.cookie = 'cooker_session=; Max-Age=0; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;'
       localStorage.removeItem('cooker_staged_profile')
       await supabase.auth.signOut()
       toast.success("Logged out successfully! See you soon, Chef! 👋")
-      router.push('/login')
+      window.location.href = '/'
     } catch (err) {
       console.error("Logout caught error:", err)
-      router.push('/login')
+      window.location.href = '/'
     }
   }
 

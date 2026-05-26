@@ -310,14 +310,14 @@ export default function DashboardPage() {
 
   const handleLogout = async () => {
     try {
-      document.cookie = 'cooker_session=; Max-Age=0; path=/;'
+      document.cookie = 'cooker_session=; Max-Age=0; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;'
       localStorage.removeItem('cooker_staged_profile')
       await supabase.auth.signOut()
       toast.success("Logged out successfully! See you soon, Chef! 👋")
-      router.push('/login')
+      window.location.href = '/'
     } catch (err) {
       console.error("Logout caught error:", err)
-      router.push('/login')
+      window.location.href = '/'
     }
   }
 
@@ -1152,37 +1152,41 @@ export default function DashboardPage() {
               </Button>
             </nav>
             
-             <div className="flex items-center gap-3">
+             <div className="flex items-center gap-4 bg-muted/40 hover:bg-muted/50 p-2.5 pl-6 pr-2.5 rounded-[2.5rem] border border-primary/10 shadow-premium transition-all duration-300 group">
+              <div className="flex flex-col items-end">
+                {userName && (
+                  <span className="text-xs font-black uppercase tracking-wider text-foreground leading-tight select-none">
+                    Chef {userName}
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="text-[10px] font-black uppercase tracking-widest text-red-500 hover:text-red-600 transition-colors bg-transparent border-none cursor-pointer p-0 mt-0.5 leading-none"
+                  title="Log Out of your Cooker account"
+                >
+                  Log Out
+                </button>
+              </div>
+              
               <Link 
                 href="/profile/setup"
-                className={cn(
-                  buttonVariants({ variant: "ghost" }),
-                  "rounded-full p-0 bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all duration-300 shadow-premium cursor-pointer border-2 border-primary/20 hover:scale-105 flex items-center justify-center w-16 h-16 overflow-hidden"
-                )}
-                title={userName ? `Logged in as Chef ${userName} - Edit Profile & Preferences` : "Edit Profile & Preferences"}
+                className="rounded-full bg-white text-muted-foreground hover:text-primary transition-all duration-300 shadow-md cursor-pointer border border-primary/10 hover:scale-105 flex items-center justify-center w-12 h-12 overflow-hidden"
+                title="Edit Profile & Preferences"
               >
                 {userAvatar ? (
                   userAvatar.startsWith('data:image') || userAvatar.startsWith('http') ? (
                     <img src={userAvatar} alt="Profile" className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-3xl select-none">{userAvatar}</span>
+                    <span className="text-2xl select-none">{userAvatar}</span>
                   )
                 ) : (
-                  <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
                     <circle cx="12" cy="7" r="4" />
                   </svg>
                 )}
               </Link>
-              
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="rounded-full bg-red-50 hover:bg-red-500 text-red-500 hover:text-white transition-all duration-300 shadow-premium border-2 border-red-100 hover:border-red-500 hover:scale-105 flex items-center justify-center w-16 h-16 cursor-pointer"
-                title="Log Out / Sign Out"
-              >
-                <LogOut className="w-5 h-5" />
-              </button>
              </div>
           </div>
         </header>
