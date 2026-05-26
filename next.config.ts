@@ -1,7 +1,16 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  allowedDevOrigins: [
+    'proud-beds-stay.loca.lt',
+    '*.loca.lt',
+    'localhost:3000',
+  ],
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '10mb',
+    },
+  },
 };
 
 export default nextConfig;

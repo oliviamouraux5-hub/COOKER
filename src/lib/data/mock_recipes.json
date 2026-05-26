@@ -1,0 +1,92 @@
+[
+  {
+    "title": "Zesty Lemon & Garlic Roasted Chicken",
+    "ingredients": [
+      { "item": "Chicken breast", "qty": "2" },
+      { "item": "Lemon", "qty": "1" },
+      { "item": "Garlic", "qty": "3 cloves" },
+      { "item": "Olive oil", "qty": "2 tbsp" },
+      { "item": "Rosemary", "qty": "1 sprig" }
+    ],
+    "instructions": [
+      "Pat the chicken dry with paper towels to ensure a crispy skin.",
+      "Mince the garlic and mix with olive oil, lemon zest, and chopped rosemary.",
+      "Rub the mixture under the skin and over the chicken breasts.",
+      "Sear in a hot oven-proof skillet for 3 minutes per side until golden.",
+      "Transfer skillet to a 200°C oven and roast for 12-15 minutes until internal temp hits 74°C.",
+      "Let rest for 5 minutes before slicing to keep the juices inside."
+    ],
+    "image_url": "https://images.unsplash.com/photo-1598103442097-8b74394b95c6?auto=format&fit=crop&q=80&w=1200",
+    "difficulty": "Intermediate",
+    "prep_time": 35,
+    "meal_type": "Dinner",
+    "diet": "High Protein"
+  },
+  {
+    "title": "Classic Italian Bruschetta",
+    "ingredients": [
+      { "item": "Tomato", "qty": "4 medium" },
+      { "item": "Basil", "qty": "1/2 cup" },
+      { "item": "Garlic", "qty": "1 clove" },
+      { "item": "Balsamic glaze", "qty": "1 tbsp" },
+      { "item": "Sourdough bread", "qty": "4 slices" }
+    ],
+    "instructions": [
+      "Diced the tomatoes and remove the seeds to prevent the bread from getting soggy.",
+      "Tear the basil leaves by hand to prevent bruising (keeps them bright green).",
+      "Mix tomatoes, basil, and a drizzle of olive oil in a bowl. Let sit for 10 minutes.",
+      "Toast the bread until golden and rub the raw garlic clove directly onto the warm surface.",
+      "Top with the tomato mixture and a final drizzle of balsamic glaze."
+    ],
+    "image_url": "https://images.unsplash.com/photo-1572656631137-7935297eff55?auto=format&fit=crop&q=80&w=1200",
+    "difficulty": "Beginner",
+    "prep_time": 15,
+    "meal_type": "Appetizer",
+    "diet": "Vegetarian"
+  },
+  {
+    "title": "Creamy Mushroom Risotto",
+    "ingredients": [
+      { "item": "Arborio rice", "qty": "1 cup" },
+      { "item": "Mushrooms", "qty": "200g" },
+      { "item": "Onion", "qty": "1 small" },
+      { "item": "Parmesan", "qty": "1/2 cup" },
+      { "item": "Vegetable stock", "qty": "3 cups" }
+    ],
+    "instructions": [
+      "Sauté sliced mushrooms in butter until they release their water and turn deep brown.",
+      "In a separate pan, soften the onion and add the rice, toasting it for 2 minutes until translucent at the edges.",
+      "Add stock one ladle at a time, stirring constantly. Wait for the liquid to be absorbed before adding more.",
+      "This constant stirring releases the rice starch, creating the signature creamy texture.",
+      "When the rice is al dente, stir in the mushrooms, parmesan, and a final knob of butter.",
+      "Serve immediately while it's still 'all'onda' (wavy)."
+    ],
+    "image_url": "https://images.unsplash.com/photo-1476124369491-e7addf5db371?auto=format&fit=crop&q=80&w=1200",
+    "difficulty": "Advanced",
+    "prep_time": 45,
+    "meal_type": "Dinner",
+    "diet": "Vegetarian"
+  },
+  {
+    "title": "Pan-Seared Salmon with Asparagus",
+    "ingredients": [
+      { "item": "Salmon fillet", "qty": "1" },
+      { "item": "Asparagus", "qty": "1 bunch" },
+      { "item": "Butter", "qty": "1 tbsp" },
+      { "item": "Lemon", "qty": "1/2" }
+    ],
+    "instructions": [
+      "Season the salmon generously with salt and pepper on both sides.",
+      "Place skin-side down in a medium-hot pan with oil. Press down with a spatula for 30 seconds to prevent curling.",
+      "Cook for 4 minutes until the skin is crispy and the flesh is cooked halfway up.",
+      "Flip and add the asparagus to the pan with a knob of butter.",
+      "Baste the salmon with the foaming butter for the final 2 minutes.",
+      "Finish with a squeeze of fresh lemon juice over the fish and greens."
+    ],
+    "image_url": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&q=80&w=1200",
+    "difficulty": "Intermediate",
+    "prep_time": 20,
+    "meal_type": "Dinner",
+    "diet": "Pescatarian"
+  }
+]
