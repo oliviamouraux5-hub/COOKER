@@ -27,7 +27,7 @@ const getRealisticFoodFallback = (title: string): string => {
   if (t.includes('salmon') || t.includes('fish') || t.includes('tuna') || t.includes('shrimp') || t.includes('seafood')) {
     return "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&q=80&w=1200";
   }
-  if (t.includes('steak') || t.includes('beef') || t.includes('ribeye') || t.includes('pork') || t.includes('lamb') || t.includes('meat')) {
+  if (t.includes('steak') || t.includes('beef') || t.includes('ribeye') || t.includes('pork') || t.includes('lamb') || t.includes('meat') || t.includes('ham') || t.includes('bacon') || t.includes('sausage')) {
     return "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=1200";
   }
   if (t.includes('soup') || t.includes('stew') || t.includes('broth') || t.includes('ramen')) {
@@ -39,7 +39,7 @@ const getRealisticFoodFallback = (title: string): string => {
   if (t.includes('egg') || t.includes('omelet') || t.includes('scramble') || t.includes('breakfast')) {
     return "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&q=80&w=1200";
   }
-  return "https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&q=80&w=1200";
+  return "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=1200";
 }
 
 export default function RecipeDetailsPage() {
