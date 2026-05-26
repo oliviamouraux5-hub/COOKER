@@ -277,7 +277,7 @@ export default function RecipeDetailsPage() {
               <Button 
                 variant="ghost" 
                 size="icon" 
-                onClick={() => router.back()} 
+                onClick={() => router.push('/dashboard')} 
                 className="text-foreground hover:bg-muted rounded-2xl h-12 w-12 flex items-center justify-center border border-muted"
               >
                 <ChevronLeft className="w-6 h-6" />

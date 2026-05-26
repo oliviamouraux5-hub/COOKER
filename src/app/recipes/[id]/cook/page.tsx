@@ -9,7 +9,7 @@ import { ChefHat, ChevronLeft, ChevronRight, CheckCircle2, Timer, Volume2, Volum
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
-import { getFridgeItems, toggleRestockItem, type FridgeItem } from '@/lib/actions/fridge'
+import { getFridgeItems, toggleRestockItem, deleteFridgeItem, type FridgeItem } from '@/lib/actions/fridge'
 
 export default function CookingModePage() {
   const params = useParams()
@@ -70,7 +70,69 @@ export default function CookingModePage() {
     }
   }
 
-  const handleCompleteAll = () => {
+  const deductIngredientsFromFridge = async () => {
+    if (!recipe || !recipe.ingredients) return
+
+    try {
+      const isDemo = typeof document !== 'undefined' && document.cookie.includes('cooker_session=demo')
+      let items: FridgeItem[] = []
+      
+      // 1. Fetch current fridge items
+      if (isDemo) {
+        const local = localStorage.getItem('cooker_fridge_inventory_v2') || '[]'
+        items = JSON.parse(local)
+      } else {
+        const res = await getFridgeItems()
+        if (res.items && !res.migrationNeeded) {
+          items = res.items
+        } else {
+          const local = localStorage.getItem('cooker_fridge_inventory_v2') || '[]'
+          items = JSON.parse(local)
+        }
+      }
+
+      // 2. Identify which fridge items match the recipe ingredients
+      const itemsToDelete: FridgeItem[] = []
+      recipe.ingredients.forEach((ing: any) => {
+        const ingName = ing.item.toLowerCase().trim()
+        if (!ingName) return
+
+        // Look for matching fridge item (robust matches like "Salmon fillet" matches "Fresh Salmon")
+        const match = items.find(item => {
+          const itemName = item.name.toLowerCase().trim()
+          return ingName.includes(itemName) || itemName.includes(ingName)
+        })
+
+        if (match && !itemsToDelete.some(it => it.id === match.id)) {
+          itemsToDelete.push(match)
+        }
+      })
+
+      if (itemsToDelete.length === 0) return
+
+      // 3. Deduct/Delete the matched items
+      if (isDemo) {
+        const remaining = items.filter(item => !itemsToDelete.some(it => it.id === item.id))
+        localStorage.setItem('cooker_fridge_inventory_v2', JSON.stringify(remaining))
+      } else {
+        // Delete each natively in Supabase database!
+        for (const item of itemsToDelete) {
+          await deleteFridgeItem(item.id)
+        }
+      }
+
+      // 4. Notify user with a gorgeous toast listing what was consumed
+      const namesList = itemsToDelete.map(it => it.name).join(', ')
+      toast.info(`Consumed from your fridge: ${namesList} 🍳`, {
+        duration: 4000
+      })
+    } catch (err) {
+      console.error("Failed to auto-deduct ingredients:", err)
+    }
+  }
+
+  const handleCompleteAll = async () => {
+    await deductIngredientsFromFridge()
     toast.success("Cooking completed! 🥳")
     router.push('/dashboard')
   }
@@ -380,7 +442,7 @@ export default function CookingModePage() {
       {/* Header / Progress Bar */}
       <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-muted">
         <div className="max-w-4xl mx-auto p-4 flex items-center justify-between">
-          <Button variant="ghost" size="icon" onClick={() => router.back()} className="rounded-2xl">
+          <Button variant="ghost" size="icon" onClick={() => router.push('/dashboard')} className="rounded-2xl">
             <ChevronLeft className="w-6 h-6" />
           </Button>
           <div className="text-center">
