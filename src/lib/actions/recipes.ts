@@ -495,7 +495,7 @@ Do NOT include any conversational introduction, no markdown fences, and output O
       // SORT BY MATCH QUALITY (Highest match first)
       const sortedMatches = scoredMatches.sort((a, b) => b.matchPercentage - a.matchPercentage)
       
-      return { recipes: sortedMatches.slice(0, 12) }
+      return { recipes: sortedMatches.slice(0, 100) }
     }
   }
 

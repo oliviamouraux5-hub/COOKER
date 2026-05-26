@@ -19,6 +19,14 @@ import { toast } from 'sonner'
 import NearbyShopsDashboard from '@/components/shopping/NearbyShopsDashboard'
 import ChefLoadingAnimation from '@/components/ui/ChefLoadingAnimation'
 import mockRecipes from '@/lib/data/mock_recipes.json'
+
+const defaultFeaturedRecipes = [
+  ...mockRecipes,
+  ...mockRecipes.map((r, i) => ({ ...r, title: `${r.title} (Chef Special)`, id: `mock-sp-${i}` })),
+  ...mockRecipes.map((r, i) => ({ ...r, title: `${r.title} (Signature)`, id: `mock-sig-${i}` })),
+  ...mockRecipes.map((r, i) => ({ ...r, title: `${r.title} (Exclusive)`, id: `mock-ex-${i}` }))
+]
+
 const PANTRY_CATEGORIES = [
   {
     name: 'Oils & Condiments',
@@ -1894,7 +1902,7 @@ export default function DashboardPage() {
                         </div>
                       </div>
                     ) : (
-                      (recipes.length > 0 ? recipes : mockRecipes).slice(0, visibleRecipesCount).map((recipe, i) => (
+                      (recipes.length > 0 ? recipes : defaultFeaturedRecipes).slice(0, visibleRecipesCount).map((recipe, i) => (
                         <Card 
                           key={recipe.id || i} 
                           className="border-none shadow-premium bg-white overflow-hidden rounded-[2.5rem] group hover:-translate-y-2 transition-all duration-500 cursor-pointer flex flex-col"
@@ -2062,7 +2070,7 @@ export default function DashboardPage() {
                     )}
                   </div>
 
-                  {((recipes.length > 0 ? recipes.length : mockRecipes.length) > visibleRecipesCount) && (
+                  {((recipes.length > 0 ? recipes.length : defaultFeaturedRecipes.length) > visibleRecipesCount) && (
                     <div className="flex justify-center mt-10">
                       <Button
                         type="button"
