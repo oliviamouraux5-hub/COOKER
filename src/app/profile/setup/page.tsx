@@ -12,7 +12,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { ChefHat, Loader2, X, Plus, Sparkles, User, Camera, Upload, ArrowLeft } from 'lucide-react'
+import { ChefHat, Loader2, X, Plus, Sparkles, User, Camera, Upload, ArrowLeft, LogOut } from 'lucide-react'
 import { toast } from 'sonner'
 import Link from 'next/link'
 
@@ -24,6 +24,19 @@ export default function ProfileSetupPage() {
   const [isFetching, setIsFetching] = useState(true)
   const [allergyInput, setAllergyInput] = useState('')
   const supabase = createClient() as any
+
+  const handleLogout = async () => {
+    try {
+      document.cookie = 'cooker_session=; Max-Age=0; path=/;'
+      localStorage.removeItem('cooker_staged_profile')
+      await supabase.auth.signOut()
+      toast.success("Logged out successfully! See you soon, Chef! 👋")
+      router.push('/login')
+    } catch (err) {
+      console.error("Logout caught error:", err)
+      router.push('/login')
+    }
+  }
 
   const { register, setValue, watch, handleSubmit, reset } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -375,10 +388,10 @@ export default function ProfileSetupPage() {
             </div>
           </CardContent>
 
-          <CardFooter className="p-8 pt-0">
+          <CardFooter className="p-8 pt-0 flex flex-col sm:flex-row gap-4 w-full">
             <Button
               type="submit"
-              className="w-full bg-primary hover:bg-primary/90 text-white py-6 text-lg rounded-2xl shadow-xl shadow-primary/25 font-black transition-all hover:-translate-y-0.5 active:scale-95 duration-200"
+              className="flex-1 bg-primary hover:bg-primary/90 text-white py-6 text-lg rounded-2xl shadow-xl shadow-primary/25 font-black transition-all hover:-translate-y-0.5 active:scale-95 duration-200"
               disabled={isLoading}
             >
               {isLoading ? (
@@ -386,6 +399,14 @@ export default function ProfileSetupPage() {
               ) : (
                 'Save Preferences'
               )}
+            </Button>
+            <Button
+              type="button"
+              onClick={handleLogout}
+              className="bg-red-50 hover:bg-red-500 text-red-500 hover:text-white py-6 px-8 text-lg rounded-2xl font-black transition-all duration-200 border-none cursor-pointer flex items-center justify-center gap-2"
+            >
+              <LogOut className="w-5 h-5" />
+              Log Out
             </Button>
           </CardFooter>
         </form>

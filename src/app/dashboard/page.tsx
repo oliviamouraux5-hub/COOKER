@@ -1181,7 +1181,7 @@ export default function DashboardPage() {
                 className="rounded-full bg-red-50 hover:bg-red-500 text-red-500 hover:text-white transition-all duration-300 shadow-premium border-2 border-red-100 hover:border-red-500 hover:scale-105 flex items-center justify-center w-16 h-16 cursor-pointer"
                 title="Log Out / Sign Out"
               >
-                <LogOut className="w-5.5 h-5.5" />
+                <LogOut className="w-5 h-5" />
               </button>
              </div>
           </div>
