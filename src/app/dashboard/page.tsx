@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { ArrowRight, Camera, ChefHat, ChevronRight, ChevronDown, Heart, History, Loader2, MapPin, Plus, Search, Share2, Sparkles, UtensilsCrossed, Trash2, ShoppingCart, Upload, Calendar, Image as ImageIcon, LogOut } from 'lucide-react'
+import { ArrowRight, Camera, ChefHat, ChevronRight, ChevronDown, Heart, History, Loader2, MapPin, Plus, Search, Share2, Sparkles, UtensilsCrossed, Trash2, ShoppingCart, Upload, Calendar, Image as ImageIcon, LogOut, HelpCircle } from 'lucide-react'
 import { toast } from 'sonner'
 import NearbyShopsDashboard from '@/components/shopping/NearbyShopsDashboard'
 import ChefLoadingAnimation from '@/components/ui/ChefLoadingAnimation'
@@ -178,6 +178,9 @@ export default function DashboardPage() {
   const [fridgeSnapshot, setFridgeSnapshot] = useState<string | null>(null)
   const [snapshotUpdatedAt, setSnapshotUpdatedAt] = useState<string | null>(null)
   const [isUploadingSnapshot, setIsUploadingSnapshot] = useState(false)
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false)
+  const [showOnboarding, setShowOnboarding] = useState(false)
+  const [onboardingStep, setOnboardingStep] = useState(1)
 
   // Supabase client and profile info
   const supabase = createClient() as any
@@ -303,6 +306,12 @@ export default function DashboardPage() {
         }
       }
       setIsFetchingFridge(false)
+      
+      const onboardingDone = localStorage.getItem('cooker_onboarding_completed')
+      if (!onboardingDone) {
+        setShowOnboarding(true)
+        setOnboardingStep(1)
+      }
     }
 
     loadFridge()
@@ -318,6 +327,73 @@ export default function DashboardPage() {
     } catch (err) {
       console.error("Logout caught error:", err)
       window.location.href = '/'
+    }
+  }
+
+  const handleNextOnboarding = () => {
+    const nextStep = onboardingStep + 1
+    setOnboardingStep(nextStep)
+    if (nextStep === 2) {
+      setActiveTab('my-fridge')
+    } else if (nextStep === 3) {
+      setActiveTab('discover')
+    } else if (nextStep === 4) {
+      setActiveTab('nearby')
+    }
+  }
+
+  const handlePrevOnboarding = () => {
+    const prevStep = onboardingStep - 1
+    setOnboardingStep(prevStep)
+    if (prevStep === 1) {
+      setActiveTab('discover')
+    } else if (prevStep === 2) {
+      setActiveTab('my-fridge')
+    } else if (prevStep === 3) {
+      setActiveTab('discover')
+    }
+  }
+
+  const handleCompleteOnboarding = () => {
+    localStorage.setItem('cooker_onboarding_completed', 'true')
+    setShowOnboarding(false)
+    toast.success("Tutorial completed! Happy Cooking, Chef! 🧑‍🍳🚀")
+  }
+
+  const handleRestartOnboarding = () => {
+    localStorage.removeItem('cooker_onboarding_completed')
+    setOnboardingStep(1)
+    setActiveTab('discover')
+    setShowOnboarding(true)
+    setIsProfileDropdownOpen(false)
+    toast.info("Onboarding tutorial restarted! Let's take a quick look around. 🗺️")
+  }
+
+  const handleResetFridge = async () => {
+    if (!window.confirm("Are you sure you want to empty your entire fridge cabinet? This will delete all ingredients permanently. 🧹")) {
+      return
+    }
+
+    try {
+      if (isDemoMode) {
+        setFridgeItems([])
+        localStorage.removeItem('cooker_fridge_inventory_v2')
+        toast.success("Fridge inventory cleared! 🧹")
+      } else {
+        const { success } = await clearAllFridgeItems()
+        if (success) {
+          setFridgeItems([])
+          toast.success("Fridge inventory cleared in Supabase! 🧹")
+        } else {
+          // Fallback to local
+          setFridgeItems([])
+          localStorage.removeItem('cooker_fridge_inventory_v2')
+          toast.success("Fridge inventory cleared locally! 🧹")
+        }
+      }
+    } catch (err) {
+      console.error("Failed to reset fridge:", err)
+      toast.error("Failed to empty fridge inventory.")
     }
   }
 
@@ -1084,12 +1160,18 @@ export default function DashboardPage() {
                 variant="ghost" 
                 onClick={() => setActiveTab('discover')}
                 className={cn(
-                  "rounded-[2rem] px-8 py-8 text-lg font-black transition-all duration-300 flex items-center gap-3",
+                  "rounded-[2rem] px-8 py-8 text-lg font-black transition-all duration-300 flex items-center gap-3 relative",
                   activeTab === 'discover' 
                     ? "bg-white text-primary shadow-xl scale-105 border border-primary/5" 
                     : "text-muted-foreground hover:text-foreground hover:bg-white/40 scale-95"
                 )}
               >
+                {showOnboarding && (onboardingStep === 1 || onboardingStep === 3) && (
+                  <span className="absolute -top-1 -right-1 flex h-4 w-4 z-20">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-4 w-4 bg-primary"></span>
+                  </span>
+                )}
                 <Sparkles className={cn("w-6 h-6", activeTab === 'discover' ? "text-primary" : "text-muted-foreground")} />
                 Discover
               </Button>
@@ -1097,7 +1179,7 @@ export default function DashboardPage() {
                 variant="ghost" 
                 onClick={() => setActiveTab('history')}
                 className={cn(
-                  "rounded-[2rem] px-8 py-8 text-lg font-black transition-all duration-300 flex items-center gap-3",
+                  "rounded-[2rem] px-8 py-8 text-lg font-black transition-all duration-300 flex items-center gap-3 relative",
                   activeTab === 'history' 
                     ? "bg-white text-blue-600 shadow-xl scale-105 border border-blue-500/5" 
                     : "text-muted-foreground hover:text-foreground hover:bg-white/40 scale-95"
@@ -1110,7 +1192,7 @@ export default function DashboardPage() {
                 variant="ghost" 
                 onClick={() => setActiveTab('favorites')}
                 className={cn(
-                  "rounded-[2rem] px-8 py-8 text-lg font-black transition-all duration-300 flex items-center gap-3",
+                  "rounded-[2rem] px-8 py-8 text-lg font-black transition-all duration-300 flex items-center gap-3 relative",
                   activeTab === 'favorites' 
                     ? "bg-white text-secondary shadow-xl scale-105 border border-secondary/5" 
                     : "text-muted-foreground hover:text-foreground hover:bg-white/40 scale-95"
@@ -1123,12 +1205,18 @@ export default function DashboardPage() {
                 variant="ghost" 
                 onClick={() => setActiveTab('nearby')}
                 className={cn(
-                  "rounded-[2rem] px-8 py-8 text-lg font-black transition-all duration-300 flex items-center gap-3",
+                  "rounded-[2rem] px-8 py-8 text-lg font-black transition-all duration-300 flex items-center gap-3 relative",
                   activeTab === 'nearby' 
                     ? "bg-white text-emerald-600 shadow-xl scale-105 border border-emerald-500/5" 
                     : "text-muted-foreground hover:text-foreground hover:bg-white/40 scale-95"
                 )}
               >
+                {showOnboarding && onboardingStep === 4 && (
+                  <span className="absolute -top-1 -right-1 flex h-4 w-4 z-20">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500"></span>
+                  </span>
+                )}
                 <MapPin className={cn("w-6 h-6", activeTab === 'nearby' ? "text-emerald-600" : "text-muted-foreground")} />
                 Nearby
               </Button>
@@ -1136,12 +1224,18 @@ export default function DashboardPage() {
                 variant="ghost" 
                 onClick={() => setActiveTab('my-fridge')}
                 className={cn(
-                  "rounded-[2rem] px-8 py-8 text-lg font-black transition-all duration-300 flex items-center gap-3",
+                  "rounded-[2rem] px-8 py-8 text-lg font-black transition-all duration-300 flex items-center gap-3 relative",
                   activeTab === 'my-fridge' 
                     ? "bg-white text-orange-500 shadow-xl scale-105 border border-orange-500/5" 
                     : "text-muted-foreground hover:text-foreground hover:bg-white/40 scale-95"
                 )}
               >
+                {showOnboarding && onboardingStep === 2 && (
+                  <span className="absolute -top-1 -right-1 flex h-4 w-4 z-20">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-500 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-4 w-4 bg-orange-500"></span>
+                  </span>
+                )}
                 <svg className={cn("w-6 h-6 stroke-[2.5]", activeTab === 'my-fridge' ? "text-orange-500" : "text-muted-foreground")} viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <rect x="6" y="2" width="12" height="20" rx="2.5" />
                   <line x1="6" y1="9" x2="18" y2="9" />
@@ -1152,41 +1246,92 @@ export default function DashboardPage() {
               </Button>
             </nav>
             
-             <div className="flex items-center gap-4 bg-muted/40 hover:bg-muted/50 p-2.5 pl-6 pr-2.5 rounded-[2.5rem] border border-primary/10 shadow-premium transition-all duration-300 group">
-              <div className="flex flex-col items-end">
-                {userName && (
-                  <span className="text-xs font-black uppercase tracking-wider text-foreground leading-tight select-none">
-                    Chef {userName}
-                  </span>
-                )}
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="text-[10px] font-black uppercase tracking-widest text-red-500 hover:text-red-600 transition-colors bg-transparent border-none cursor-pointer p-0 mt-0.5 leading-none"
-                  title="Log Out of your Cooker account"
-                >
-                  Log Out
-                </button>
-              </div>
-              
-              <Link 
-                href="/profile/setup"
-                className="rounded-full bg-white text-muted-foreground hover:text-primary transition-all duration-300 shadow-md cursor-pointer border border-primary/10 hover:scale-105 flex items-center justify-center w-12 h-12 overflow-hidden"
-                title="Edit Profile & Preferences"
+             <div className="relative">
+              <button 
+                type="button"
+                onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                className="rounded-full p-0 bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all duration-300 shadow-premium cursor-pointer border-2 border-primary/20 hover:scale-105 flex items-center justify-center w-16 h-16 overflow-hidden"
+                title="User settings and logout"
               >
                 {userAvatar ? (
                   userAvatar.startsWith('data:image') || userAvatar.startsWith('http') ? (
                     <img src={userAvatar} alt="Profile" className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-2xl select-none">{userAvatar}</span>
+                    <span className="text-3xl select-none">{userAvatar}</span>
                   )
                 ) : (
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
                     <circle cx="12" cy="7" r="4" />
                   </svg>
                 )}
-              </Link>
+              </button>
+
+              {isProfileDropdownOpen && (
+                <>
+                  {/* Overlay click-away trigger */}
+                  <div 
+                    className="fixed inset-0 z-40 cursor-default" 
+                    onClick={() => setIsProfileDropdownOpen(false)}
+                  />
+                  
+                  {/* Floating settings card */}
+                  <div className="absolute right-0 mt-4 w-72 bg-white rounded-[2rem] shadow-2xl border border-primary/10 p-6 z-50 animate-in fade-in slide-in-from-top-4 duration-300">
+                    <div className="flex items-center gap-4 border-b border-muted pb-4 mb-4">
+                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-2xl border border-primary/20 overflow-hidden">
+                        {userAvatar && (userAvatar.startsWith('data:image') || userAvatar.startsWith('http')) ? (
+                          <img src={userAvatar} alt="Profile" className="w-full h-full object-cover rounded-full" />
+                        ) : (
+                          <span>{userAvatar || '🧑‍🍳'}</span>
+                        )}
+                      </div>
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-sm font-black text-foreground truncate">
+                          Chef {userName || 'Cooker'}
+                        </span>
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                          Active Session
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Link
+                        href="/profile/setup"
+                        onClick={() => setIsProfileDropdownOpen(false)}
+                        className="flex items-center gap-3 w-full p-4 rounded-2xl hover:bg-primary/5 text-foreground hover:text-primary transition-all font-black text-sm text-left group cursor-pointer"
+                      >
+                        <svg className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                          <circle cx="12" cy="7" r="4" />
+                        </svg>
+                        Edit Profile
+                      </Link>
+
+                      <button
+                        type="button"
+                        onClick={handleRestartOnboarding}
+                        className="flex items-center gap-3 w-full p-4 rounded-2xl hover:bg-primary/5 text-foreground hover:text-primary transition-all font-black text-sm text-left group cursor-pointer border-none bg-transparent"
+                      >
+                        <HelpCircle className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                        Restart Tutorial
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsProfileDropdownOpen(false)
+                          handleLogout()
+                        }}
+                        className="flex items-center gap-3 w-full p-4 rounded-2xl hover:bg-red-50 text-red-500 transition-all font-black text-sm text-left group cursor-pointer border-none bg-transparent"
+                      >
+                        <LogOut className="w-5 h-5 text-red-500" />
+                        Log Out
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
              </div>
           </div>
         </header>
@@ -1291,6 +1436,15 @@ export default function DashboardPage() {
                         Stock Cabinet Shelves
                       </h3>
                       <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={handleResetFridge}
+                          className="flex items-center gap-2 bg-red-50 hover:bg-red-500 text-red-500 hover:text-white px-5 py-2.5 rounded-2xl text-sm font-black uppercase tracking-wider transition-all border border-red-200 hover:border-red-500 active:scale-95 cursor-pointer"
+                          title="Reset entire fridge cabinet"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          Reset Fridge
+                        </button>
                         <button
                           type="button"
                           onClick={() => {
@@ -2280,6 +2434,112 @@ export default function DashboardPage() {
                 </div>
               )
             })()}
+          </div>
+        </div>
+      )}
+
+      {/* Onboarding Welcome Tutorial Modal Card */}
+      {showOnboarding && (
+        <div className="fixed bottom-8 right-8 z-50 w-full max-w-sm p-1.5 animate-in slide-in-from-bottom-8 slide-in-from-right-8 duration-500">
+          <div className="bg-white/85 backdrop-blur-xl border border-primary/20 rounded-[2.5rem] p-8 shadow-[0_20px_50px_rgba(234,88,12,0.15)] space-y-6 relative overflow-hidden group">
+            {/* Glowing background ring */}
+            <div className="absolute -top-12 -right-12 w-32 h-32 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/15 transition-all duration-500" />
+            
+            {/* Step Icon & Header */}
+            <div className="flex items-start gap-4">
+              <div className="p-3.5 bg-primary/10 rounded-2xl text-2xl border border-primary/20 animate-pulse">
+                {onboardingStep === 1 && '🧑‍🍳'}
+                {onboardingStep === 2 && '🥬'}
+                {onboardingStep === 3 && '✨'}
+                {onboardingStep === 4 && '🛒'}
+              </div>
+              <div className="space-y-1 min-w-0">
+                <span className="text-[10px] font-black uppercase tracking-widest text-primary/70">
+                  Step {onboardingStep} of 4
+                </span>
+                <h4 className="font-black text-lg text-foreground leading-tight">
+                  {onboardingStep === 1 && "Welcome to COOKER!"}
+                  {onboardingStep === 2 && "Stock Your Fridge!"}
+                  {onboardingStep === 3 && "Discover Recipes!"}
+                  {onboardingStep === 4 && "Find Ingredients!"}
+                </h4>
+              </div>
+            </div>
+
+            {/* Description Text */}
+            <p className="text-xs font-semibold text-muted-foreground leading-relaxed">
+              {onboardingStep === 1 && "Welcome, Chef! Cooker is your intelligent, AI-powered personal chef assistant. Let's take a quick 1-minute tour to get you ready to cook delicious meals tailored perfectly to what you already have in stock!"}
+              {onboardingStep === 2 && "Let us know what ingredients you have! You can manually place ingredients on your Refrigerator Doors and crispers, or upload a photo of your physical fridge to let our AI scan the shelves automatically."}
+              {onboardingStep === 3 && "Once your cabinet has ingredients, head to Discover! Our elite AI chef persona engines will craft custom gourmet recipes matched perfectly to your cabinet stock and dietary preferences."}
+              {onboardingStep === 4 && "Missing an ingredient for a recipe? Simply click on any ingredient to view real-time maps showing nearby grocery stores that have it in stock. You'll always find what you need!"}
+            </p>
+
+            {/* Pagination dots & Navigation actions */}
+            <div className="flex items-center justify-between pt-4 border-t border-muted/60">
+              {/* Pagination Dots */}
+              <div className="flex gap-1.5">
+                {[1, 2, 3, 4].map((step) => (
+                  <span
+                    key={step}
+                    className={cn(
+                      "h-1.5 rounded-full transition-all duration-300",
+                      onboardingStep === step ? "w-5 bg-primary" : "w-1.5 bg-muted-foreground/30"
+                    )}
+                  />
+                ))}
+              </div>
+
+              {/* Navigation Actions */}
+              <div className="flex items-center gap-2">
+                {onboardingStep === 1 ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleCompleteOnboarding}
+                      className="text-xs font-black uppercase tracking-wider text-muted-foreground/60 hover:text-muted-foreground transition-colors cursor-pointer"
+                    >
+                      Skip
+                    </button>
+                    <Button
+                      type="button"
+                      onClick={handleNextOnboarding}
+                      className="bg-primary hover:bg-primary/90 text-white font-black text-xs px-4 py-2.5 rounded-xl flex items-center gap-1 shadow-md shadow-primary/20"
+                    >
+                      Next 
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handlePrevOnboarding}
+                      className="text-xs font-black uppercase tracking-wider text-muted-foreground/60 hover:text-muted-foreground transition-colors cursor-pointer"
+                    >
+                      Back
+                    </button>
+                    {onboardingStep === 4 ? (
+                      <Button
+                        type="button"
+                        onClick={handleCompleteOnboarding}
+                        className="bg-primary hover:bg-primary/90 text-white font-black text-xs px-4 py-2.5 rounded-xl flex items-center gap-1 shadow-md shadow-primary/20 animate-bounce"
+                      >
+                        Let&apos;s Cook! 🚀
+                      </Button>
+                    ) : (
+                      <Button
+                        type="button"
+                        onClick={handleNextOnboarding}
+                        className="bg-primary hover:bg-primary/90 text-white font-black text-xs px-4 py-2.5 rounded-xl flex items-center gap-1 shadow-md shadow-primary/20"
+                      >
+                        Next
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </Button>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       )}
