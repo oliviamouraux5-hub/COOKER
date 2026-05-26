@@ -38,7 +38,7 @@ export default function SignupPage() {
         setIsLoading(false)
       } else {
         toast.success('Welcome to the kitchen, Chef!')
-        router.push('/dashboard')
+        router.push('/profile/setup')
       }
     } catch (err: any) {
       console.error("Signup onSubmit caught error:", err)

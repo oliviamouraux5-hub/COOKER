@@ -179,6 +179,11 @@ export default function DashboardPage() {
   const [snapshotUpdatedAt, setSnapshotUpdatedAt] = useState<string | null>(null)
   const [isUploadingSnapshot, setIsUploadingSnapshot] = useState(false)
 
+  // Supabase client and profile info
+  const supabase = createClient() as any
+  const [userName, setUserName] = useState<string>('')
+  const [userAvatar, setUserAvatar] = useState<string>('')
+
   // Hero centerpiece ingredient input
   const [heroInput, setHeroInput] = useState('')
   const [showSyncedList, setShowSyncedList] = useState(false)
@@ -240,6 +245,26 @@ export default function DashboardPage() {
           if (snapRes?.snapshot) {
             setFridgeSnapshot(snapRes.snapshot.photo_base64)
             setSnapshotUpdatedAt(new Date(snapRes.snapshot.updated_at || '').toLocaleString())
+          }
+          
+          try {
+            const { data: { user } } = await supabase.auth.getUser()
+            if (user) {
+              const { data: profile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', user.id)
+                .single()
+              
+              if (profile) {
+                const name = profile.full_name || profile.dietary_preferences?.full_name_fallback || profile.username || ''
+                const avatar = profile.avatar_url || profile.dietary_preferences?.avatar_url_fallback || '🧑‍🍳'
+                setUserName(name)
+                setUserAvatar(avatar)
+              }
+            }
+          } catch (e) {
+            console.error("Failed loading user profile on dashboard:", e)
           }
         }
       }
@@ -1014,80 +1039,109 @@ export default function DashboardPage() {
             </div>
             <div>
               <h1 className="text-4xl font-black text-foreground tracking-tight italic group-hover:text-primary transition-colors duration-300">COOKER</h1>
+              {userName && (
+                <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground/60 mt-0.5 ml-0.5 animate-in fade-in duration-300">
+                  Chef {userName}
+                </p>
+              )}
             </div>
           </Link>
-          <nav className="flex items-center bg-muted/80 p-2 rounded-[2.5rem] border border-primary/10 shadow-premium">
-            <Button 
-              variant="ghost" 
-              onClick={() => setActiveTab('discover')}
+          <div className="flex items-center gap-4 flex-col md:flex-row">
+            <nav className="flex items-center bg-muted/80 p-2 rounded-[2.5rem] border border-primary/10 shadow-premium">
+              <Button 
+                variant="ghost" 
+                onClick={() => setActiveTab('discover')}
+                className={cn(
+                  "rounded-[2rem] px-8 py-8 text-lg font-black transition-all duration-300 flex items-center gap-3",
+                  activeTab === 'discover' 
+                    ? "bg-white text-primary shadow-xl scale-105 border border-primary/5" 
+                    : "text-muted-foreground hover:text-foreground hover:bg-white/40 scale-95"
+                )}
+              >
+                <Sparkles className={cn("w-6 h-6", activeTab === 'discover' ? "text-primary" : "text-muted-foreground")} />
+                Discover
+              </Button>
+              <Button 
+                variant="ghost" 
+                onClick={() => setActiveTab('history')}
+                className={cn(
+                  "rounded-[2rem] px-8 py-8 text-lg font-black transition-all duration-300 flex items-center gap-3",
+                  activeTab === 'history' 
+                    ? "bg-white text-blue-600 shadow-xl scale-105 border border-blue-500/5" 
+                    : "text-muted-foreground hover:text-foreground hover:bg-white/40 scale-95"
+                )}
+              >
+                <History className={cn("w-6 h-6", activeTab === 'history' ? "text-blue-600" : "text-muted-foreground")} />
+                History
+              </Button>
+              <Button 
+                variant="ghost" 
+                onClick={() => setActiveTab('favorites')}
+                className={cn(
+                  "rounded-[2rem] px-8 py-8 text-lg font-black transition-all duration-300 flex items-center gap-3",
+                  activeTab === 'favorites' 
+                    ? "bg-white text-secondary shadow-xl scale-105 border border-secondary/5" 
+                    : "text-muted-foreground hover:text-foreground hover:bg-white/40 scale-95"
+                )}
+              >
+                <Heart className={cn("w-6 h-6", activeTab === 'favorites' ? "text-secondary fill-current" : "text-muted-foreground")} />
+                Favorites
+              </Button>
+              <Button 
+                variant="ghost" 
+                onClick={() => setActiveTab('nearby')}
+                className={cn(
+                  "rounded-[2rem] px-8 py-8 text-lg font-black transition-all duration-300 flex items-center gap-3",
+                  activeTab === 'nearby' 
+                    ? "bg-white text-emerald-600 shadow-xl scale-105 border border-emerald-500/5" 
+                    : "text-muted-foreground hover:text-foreground hover:bg-white/40 scale-95"
+                )}
+              >
+                <MapPin className={cn("w-6 h-6", activeTab === 'nearby' ? "text-emerald-600" : "text-muted-foreground")} />
+                Nearby
+              </Button>
+              <Button 
+                variant="ghost" 
+                onClick={() => setActiveTab('my-fridge')}
+                className={cn(
+                  "rounded-[2rem] px-8 py-8 text-lg font-black transition-all duration-300 flex items-center gap-3",
+                  activeTab === 'my-fridge' 
+                    ? "bg-white text-orange-500 shadow-xl scale-105 border border-orange-500/5" 
+                    : "text-muted-foreground hover:text-foreground hover:bg-white/40 scale-95"
+                )}
+              >
+                <svg className={cn("w-6 h-6 stroke-[2.5]", activeTab === 'my-fridge' ? "text-orange-500" : "text-muted-foreground")} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <rect x="6" y="2" width="12" height="20" rx="2.5" />
+                  <line x1="6" y1="9" x2="18" y2="9" />
+                  <line x1="9" y1="5" x2="9" y2="7" />
+                  <line x1="9" y1="12" x2="9" y2="16" />
+                </svg>
+                My Fridge
+              </Button>
+            </nav>
+            
+            <Link 
+              href="/profile/setup"
               className={cn(
-                "rounded-[2rem] px-8 py-8 text-lg font-black transition-all duration-300 flex items-center gap-3",
-                activeTab === 'discover' 
-                  ? "bg-white text-primary shadow-xl scale-105 border border-primary/5" 
-                  : "text-muted-foreground hover:text-foreground hover:bg-white/40 scale-95"
+                buttonVariants({ variant: "ghost" }),
+                "rounded-full p-0 bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all duration-300 shadow-premium cursor-pointer border-2 border-primary/20 hover:scale-105 flex items-center justify-center w-16 h-16 overflow-hidden"
               )}
+              title={userName ? `Logged in as Chef ${userName} - Edit Profile & Preferences` : "Edit Profile & Preferences"}
             >
-              <Sparkles className={cn("w-6 h-6", activeTab === 'discover' ? "text-primary" : "text-muted-foreground")} />
-              Discover
-            </Button>
-            <Button 
-              variant="ghost" 
-              onClick={() => setActiveTab('history')}
-              className={cn(
-                "rounded-[2rem] px-8 py-8 text-lg font-black transition-all duration-300 flex items-center gap-3",
-                activeTab === 'history' 
-                  ? "bg-white text-blue-600 shadow-xl scale-105 border border-blue-500/5" 
-                  : "text-muted-foreground hover:text-foreground hover:bg-white/40 scale-95"
+              {userAvatar ? (
+                userAvatar.startsWith('data:image') || userAvatar.startsWith('http') ? (
+                  <img src={userAvatar} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-3xl select-none">{userAvatar}</span>
+                )
+              ) : (
+                <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
               )}
-            >
-              <History className={cn("w-6 h-6", activeTab === 'history' ? "text-blue-600" : "text-muted-foreground")} />
-              History
-            </Button>
-            <Button 
-              variant="ghost" 
-              onClick={() => setActiveTab('favorites')}
-              className={cn(
-                "rounded-[2rem] px-8 py-8 text-lg font-black transition-all duration-300 flex items-center gap-3",
-                activeTab === 'favorites' 
-                  ? "bg-white text-secondary shadow-xl scale-105 border border-secondary/5" 
-                  : "text-muted-foreground hover:text-foreground hover:bg-white/40 scale-95"
-              )}
-            >
-              <Heart className={cn("w-6 h-6", activeTab === 'favorites' ? "text-secondary fill-current" : "text-muted-foreground")} />
-              Favorites
-            </Button>
-            <Button 
-              variant="ghost" 
-              onClick={() => setActiveTab('nearby')}
-              className={cn(
-                "rounded-[2rem] px-8 py-8 text-lg font-black transition-all duration-300 flex items-center gap-3",
-                activeTab === 'nearby' 
-                  ? "bg-white text-emerald-600 shadow-xl scale-105 border border-emerald-500/5" 
-                  : "text-muted-foreground hover:text-foreground hover:bg-white/40 scale-95"
-              )}
-            >
-              <MapPin className={cn("w-6 h-6", activeTab === 'nearby' ? "text-emerald-600" : "text-muted-foreground")} />
-              Nearby
-            </Button>
-            <Button 
-              variant="ghost" 
-              onClick={() => setActiveTab('my-fridge')}
-              className={cn(
-                "rounded-[2rem] px-8 py-8 text-lg font-black transition-all duration-300 flex items-center gap-3",
-                activeTab === 'my-fridge' 
-                  ? "bg-white text-orange-500 shadow-xl scale-105 border border-orange-500/5" 
-                  : "text-muted-foreground hover:text-foreground hover:bg-white/40 scale-95"
-              )}
-            >
-              <svg className={cn("w-6 h-6 stroke-[2.5]", activeTab === 'my-fridge' ? "text-orange-500" : "text-muted-foreground")} viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <rect x="6" y="2" width="12" height="20" rx="2.5" />
-                <line x1="6" y1="9" x2="18" y2="9" />
-                <line x1="9" y1="5" x2="9" y2="7" />
-                <line x1="9" y1="12" x2="9" y2="16" />
-              </svg>
-              My Fridge
-            </Button>
-          </nav>
+            </Link>
+          </div>
         </header>
 
           {/* Results Section */}
