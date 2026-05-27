@@ -48,6 +48,7 @@ export default function ProfileSetupPage() {
         gluten_free: false,
         vegetarian: false,
         keto: false,
+        cooking_level: 'intermediate',
       },
       allergies: [],
     }
@@ -76,6 +77,7 @@ export default function ProfileSetupPage() {
                 gluten_free: !!profile.dietary_preferences?.gluten_free,
                 vegetarian: !!profile.dietary_preferences?.vegetarian,
                 keto: !!profile.dietary_preferences?.keto,
+                cooking_level: profile.dietary_preferences?.cooking_level || 'intermediate',
               },
               allergies: Array.isArray(profile.allergies) ? profile.allergies : [],
             })
@@ -110,6 +112,7 @@ export default function ProfileSetupPage() {
               gluten_free: !!profile.dietary_preferences?.gluten_free,
               vegetarian: !!profile.dietary_preferences?.vegetarian,
               keto: !!profile.dietary_preferences?.keto,
+              cooking_level: profile.dietary_preferences?.cooking_level || 'intermediate',
             },
             allergies: Array.isArray(profile.allergies) ? profile.allergies : [],
           })
@@ -321,32 +324,7 @@ export default function ProfileSetupPage() {
               </div>
             </div>
 
-            {/* DIETARY STYLE */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-secondary/10 rounded-xl text-secondary">
-                  <ChefHat className="w-5 h-5" />
-                </div>
-                <h3 className="text-sm font-black uppercase tracking-wider text-foreground">Dietary Style</h3>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                {Object.keys(dietPrefs).map((diet) => (
-                  <div key={diet} className="flex items-center space-x-3 bg-muted/30 p-4 rounded-2xl border border-transparent hover:border-primary/10 transition-all cursor-pointer group">
-                    <Checkbox 
-                      id={diet} 
-                      checked={(dietPrefs as any)[diet]}
-                      onCheckedChange={(checked) => {
-                        setValue(`dietary_preferences.${diet}` as any, checked)
-                      }}
-                      className="w-5 h-5 rounded border-primary data-[state=checked]:bg-primary"
-                    />
-                    <Label htmlFor={diet} className="capitalize cursor-pointer text-xs font-bold group-hover:text-primary transition-colors text-foreground">
-                      {diet.replace('_', ' ')}
-                    </Label>
-                  </div>
-                ))}
-              </div>
-            </div>
+
 
             {/* ALLERGIES & AVOIDANCES */}
             <div className="space-y-4">

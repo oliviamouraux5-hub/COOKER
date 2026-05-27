@@ -201,7 +201,9 @@ export default function LandingPage() {
               {[
                 { name: "CHARLOTTE HIRTZ", role: "Busy Professional", text: "COOKER saved my weeknight dinners. I never knew I could make so much with just some eggs and spinach!" },
                 { name: "GALA CARDI CIGOLI", role: "Eco-conscious Cook", text: "Finally an app that automatically syncs and understands what's actually in my fridge!" },
-                { name: "LOU ANNE CERANIC", role: "Creative Cook", text: "The instant photo scanning is pure magic! It found the perfect recipe for my leftover zucchini and tomatoes in seconds." }
+                { name: "LOU ANNE CERANIC", role: "Creative Cook", text: "The instant photo scanning is pure magic! It found the perfect recipe for my leftover zucchini and tomatoes in seconds." },
+                { name: "OLIVIA MOURAUX", role: "Culinary Architect", text: "Finding grocery stores with exact missing ingredients on the map is a total game changer. COOKER is my ultimate sous-chef!" },
+                { name: "LARA TIRASIN", role: "Gourmet Connoisseur", text: "The distraction-free cooking guide with voice directions is incredibly smooth. I cooked a flawless dinner without touching my screen once!" }
               ].map((t, i) => (
                 <div key={i} className="bg-white p-10 rounded-[3rem] shadow-premium space-y-6 border border-primary/5 hover:-translate-y-2 transition-transform duration-500">
                   <div className="flex text-secondary">
