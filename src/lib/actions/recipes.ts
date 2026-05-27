@@ -666,9 +666,64 @@ export async function toggleFavorite(recipeId: string, isFavorite: boolean) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: true } // Return success in demo mode
 
+  // 1. Validate UUID structure to prevent Postgres cast errors on mock IDs
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(recipeId)
+  if (!isUuid) {
+    return { success: true } // Return success for offline mock interactions
+  }
+
+  // 2. Fetch recipe ownership
+  const { data: existing } = await supabase
+    .from('recipes')
+    .select('id, user_id')
+    .eq('id', recipeId)
+    .maybeSingle()
+
+  if (existing && existing.user_id !== user.id) {
+    if (isFavorite) {
+      const { data: fullRecipe } = await supabase
+        .from('recipes')
+        .select('*')
+        .eq('id', recipeId)
+        .single()
+
+      if (fullRecipe) {
+        const { error: insertError } = await supabase.from('recipes').insert({
+          title: fullRecipe.title,
+          ingredients: fullRecipe.ingredients,
+          instructions: fullRecipe.instructions,
+          image_url: fullRecipe.image_url,
+          is_public: true,
+          user_id: user.id,
+          difficulty: fullRecipe.difficulty,
+          prep_time: fullRecipe.prep_time,
+          diet: fullRecipe.diet,
+          is_ai_generated: fullRecipe.is_ai_generated
+        })
+        if (insertError) return { error: insertError.message }
+      }
+    } else {
+      const { data: fullRecipe } = await supabase
+        .from('recipes')
+        .select('title')
+        .eq('id', recipeId)
+        .single()
+      
+      if (fullRecipe) {
+        await supabase
+          .from('recipes')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('title', fullRecipe.title)
+      }
+    }
+    return { success: true }
+  }
+
+  // 3. Update owned recipe
   const { error } = await supabase
     .from('recipes')
-    .update({ is_public: isFavorite }) // Using is_public as a proxy for favorite in this demo
+    .update({ is_public: isFavorite })
     .eq('id', recipeId)
     .eq('user_id', user.id)
 

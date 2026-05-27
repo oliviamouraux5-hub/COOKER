@@ -1944,13 +1944,28 @@ export default function DashboardPage() {
                                 className="rounded-xl bg-white/90 backdrop-blur-md shadow-lg hover:bg-white text-foreground"
                                 onClick={async (e) => {
                                   e.stopPropagation();
-                                  if (!recipe.id) {
-                                    toast.error("Please start cooking this recipe to favorite it permanently");
+                                  const isUuid = recipe.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(recipe.id);
+                                  const isFav = !recipe.is_public;
+
+                                  if (!isUuid) {
+                                    // For mock or unsaved recipes, save in personal catalog first with favorite state = true!
+                                    const createRes = await createRecipe({
+                                      ...recipe,
+                                      is_public: true
+                                    });
+                                    if (createRes.success && createRes.recipe) {
+                                      toast.success("Added to favorites!");
+                                      const favs = await getFavorites();
+                                      if (favs.recipes) setFavoriteRecipes(favs.recipes);
+                                    } else {
+                                      toast.error("Login to save favorites");
+                                    }
                                     return;
                                   }
-                                  const res = await toggleFavorite(recipe.id, !recipe.is_public);
+
+                                  const res = await toggleFavorite(recipe.id, isFav);
                                   if (res.success) {
-                                    toast.success(!recipe.is_public ? "Added to favorites!" : "Removed from favorites");
+                                    toast.success(isFav ? "Added to favorites!" : "Removed from favorites");
                                     const favs = await getFavorites();
                                     if (favs.recipes) setFavoriteRecipes(favs.recipes);
                                   } else {
