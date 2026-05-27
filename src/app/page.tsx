@@ -199,9 +199,9 @@ export default function LandingPage() {
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[
-                { name: "Sarah L.", role: "Busy Parent", text: "COOKER saved my weeknight dinners. I never knew I could make so much with just some eggs and spinach!" },
-                { name: "Marcus T.", role: "Student", text: "Finally an app that understands my budget and what's actually in my tiny fridge." },
-                { name: "Elena R.", role: "Foodie", text: "The AI chef personas are hilarious and actually give great culinary advice. 10/10." }
+                { name: "CHARLOTTE HIRTZ", role: "Busy Professional", text: "COOKER saved my weeknight dinners. I never knew I could make so much with just some eggs and spinach!" },
+                { name: "GALA CARDI CIGOLI", role: "Eco-conscious Cook", text: "Finally an app that automatically syncs and understands what's actually in my fridge!" },
+                { name: "LOU ANNE CERANIC", role: "Creative Cook", text: "The instant photo scanning is pure magic! It found the perfect recipe for my leftover zucchini and tomatoes in seconds." }
               ].map((t, i) => (
                 <div key={i} className="bg-white p-10 rounded-[3rem] shadow-premium space-y-6 border border-primary/5 hover:-translate-y-2 transition-transform duration-500">
                   <div className="flex text-secondary">
