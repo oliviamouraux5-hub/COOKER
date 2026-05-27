@@ -169,10 +169,9 @@ export default function LandingPage() {
                 </div>
                 <div className="pt-10 flex items-center text-primary font-black text-sm uppercase tracking-wider gap-2">
                   <span>Smart Leftover Engine</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
-
+ 
               {/* Card 2: Library */}
               <div className="bg-white p-12 rounded-[3.5rem] shadow-premium border border-primary/5 hover:border-secondary/20 hover:-translate-y-1 transition-all duration-500 flex flex-col justify-between group">
                 <div className="space-y-6">
@@ -186,7 +185,6 @@ export default function LandingPage() {
                 </div>
                 <div className="pt-10 flex items-center text-secondary font-black text-sm uppercase tracking-wider gap-2">
                   <span>Gourmet Recipe Library</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
             </div>
