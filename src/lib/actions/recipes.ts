@@ -6,6 +6,27 @@ import { revalidatePath } from 'next/cache'
 import eliteRecipes from '@/lib/data/elite_recipes.json'
 import { INGREDIENT_MEAL_MAP, MealType } from '@/lib/data/culinary_knowledge'
 
+const IGNORED_MODIFIERS = new Set([
+  'fresh', 'organic', 'baby', 'leaves', 'powder', 'clove', 'cloves', 'unsalted', 'salted',
+  'ground', 'pieces', 'sliced', 'chopped', 'diced', 'minced', 'whole', 'crushed',
+  'large', 'medium', 'small', 'shredded', 'grated', 'dried', 'dry', 'raw', 'cooked',
+  'extra', 'virgin', 'pure', 'natural', 'sweet', 'hot', 'spicy', 'cold'
+])
+
+function ingredientsMatch(recipeIng: string, userIng: string): boolean {
+  const cleanRecipe = recipeIng.toLowerCase().replace(/[^a-z\s]/g, '').trim()
+  const cleanUser = userIng.toLowerCase().replace(/[^a-z\s]/g, '').trim()
+  
+  const recipeTokens = cleanRecipe.split(/\s+/).filter(w => w.length > 2 && !IGNORED_MODIFIERS.has(w))
+  const userTokens = cleanUser.split(/\s+/).filter(w => w.length > 2 && !IGNORED_MODIFIERS.has(w))
+  
+  if (recipeTokens.length === 0 || userTokens.length === 0) {
+    return cleanRecipe.includes(cleanUser) || cleanUser.includes(cleanRecipe)
+  }
+  
+  return recipeTokens.some(rt => userTokens.some(ut => rt.includes(ut) || ut.includes(rt)))
+}
+
 export async function generateRecipes(values: FridgeFormValues & { selectedHeroes?: string[], manualIngredients?: string }) {
   // Validate input
   const validatedFields = fridgeSchema.safeParse(values)
@@ -150,16 +171,20 @@ Do NOT include any conversational introduction, no markdown fences, and output O
               console.log(`Successfully generated ${parsed.length} gourmet recipes using endpoint [${successfulUrl}]`)
               
               parsed.forEach(recipe => {
-                const totalRecipeIngredients = Array.isArray(recipe.ingredients) ? recipe.ingredients.length : 0
-                const missingCount = Array.isArray(recipe.missingIngredients) ? recipe.missingIngredients.length : 0
-                const matched = totalRecipeIngredients - missingCount
+                const recipeIngs = Array.isArray(recipe.ingredients)
+                  ? recipe.ingredients.map((i: any) => typeof i === 'string' ? i.toLowerCase() : (i?.item || '').toLowerCase()).filter(Boolean)
+                  : []
+                
+                const matchedIngs = recipeIngs.filter((ri: string) => totalPool.some(tp => ingredientsMatch(ri, tp)))
+                const missingIngredients = recipeIngs.filter((ri: string) => !totalPool.some(tp => ingredientsMatch(ri, tp)))
 
-                recipe.totalCount = totalRecipeIngredients
-                recipe.matchedCount = matched < 0 ? 0 : matched
-                recipe.matchPercentage = totalRecipeIngredients > 0 
-                  ? Math.round((recipe.matchedCount / totalRecipeIngredients) * 100) 
+                recipe.totalCount = recipeIngs.length
+                recipe.matchedCount = matchedIngs.length
+                recipe.matchPercentage = recipeIngs.length > 0 
+                  ? Math.round((matchedIngs.length / recipeIngs.length) * 100) 
                   : 100
                 if (recipe.matchPercentage > 100) recipe.matchPercentage = 100
+                recipe.missingIngredients = missingIngredients.map((i: string) => i.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')).slice(0, 3)
 
                 // Strict Prep Time Override: If Gemini hallucinates a time above requested threshold, override it safely!
                 if (prepTime) {
@@ -183,16 +208,20 @@ Do NOT include any conversational introduction, no markdown fences, and output O
               const parsed = JSON.parse(match[0])
               if (Array.isArray(parsed)) {
                 parsed.forEach(recipe => {
-                  const totalRecipeIngredients = Array.isArray(recipe.ingredients) ? recipe.ingredients.length : 0
-                  const missingCount = Array.isArray(recipe.missingIngredients) ? recipe.missingIngredients.length : 0
-                  const matched = totalRecipeIngredients - missingCount
+                  const recipeIngs = Array.isArray(recipe.ingredients)
+                    ? recipe.ingredients.map((i: any) => typeof i === 'string' ? i.toLowerCase() : (i?.item || '').toLowerCase()).filter(Boolean)
+                    : []
+                  
+                  const matchedIngs = recipeIngs.filter((ri: string) => totalPool.some(tp => ingredientsMatch(ri, tp)))
+                  const missingIngredients = recipeIngs.filter((ri: string) => !totalPool.some(tp => ingredientsMatch(ri, tp)))
 
-                  recipe.totalCount = totalRecipeIngredients
-                  recipe.matchedCount = matched < 0 ? 0 : matched
-                  recipe.matchPercentage = totalRecipeIngredients > 0 
-                    ? Math.round((recipe.matchedCount / totalRecipeIngredients) * 100) 
+                  recipe.totalCount = recipeIngs.length
+                  recipe.matchedCount = matchedIngs.length
+                  recipe.matchPercentage = recipeIngs.length > 0 
+                    ? Math.round((matchedIngs.length / recipeIngs.length) * 100) 
                     : 100
                   if (recipe.matchPercentage > 100) recipe.matchPercentage = 100
+                  recipe.missingIngredients = missingIngredients.map((i: string) => i.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')).slice(0, 3)
 
                   // Strict Prep Time Override
                   if (prepTime) {
@@ -478,9 +507,9 @@ Do NOT include any conversational introduction, no markdown fences, and output O
       // Calculate scores for all matches
       const scoredMatches = matches.map(r => {
         const recipeIngs = r.ner_ingredients.map((i: string) => i.toLowerCase())
-        const matchedIngs = recipeIngs.filter((ri: string) => totalPool.some(tp => ri.includes(tp)))
+        const matchedIngs = recipeIngs.filter((ri: string) => totalPool.some(tp => ingredientsMatch(ri, tp)))
         const matchPercentage = Math.round((matchedIngs.length / recipeIngs.length) * 100)
-        const missingIngredients = r.ner_ingredients.filter((ri: string) => !totalPool.some(tp => ri.toLowerCase().includes(tp)))
+        const missingIngredients = r.ner_ingredients.filter((ri: string) => !totalPool.some(tp => ingredientsMatch(ri, tp)))
         
         return { 
           ...r, 

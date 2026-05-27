@@ -203,16 +203,32 @@ export default function LandingPage() {
                 { name: "GALA CARDI CIGOLI", role: "Eco-conscious Cook", text: "Finally an app that automatically syncs and understands what's actually in my fridge!" },
                 { name: "LOU ANNE CERANIC", role: "Creative Cook", text: "The instant photo scanning is pure magic! It found the perfect recipe for my leftover zucchini and tomatoes in seconds." },
                 { name: "OLIVIA MOURAUX", role: "Culinary Architect", text: "Finding grocery stores with exact missing ingredients on the map is a total game changer. COOKER is my ultimate sous-chef!" },
-                { name: "LARA TIRASIN", role: "Gourmet Connoisseur", text: "The distraction-free cooking guide with voice directions is incredibly smooth. I cooked a flawless dinner without touching my screen once!" }
+                { name: "LARA TIRASIN", role: "Gourmet Connoisseur", text: "The distraction-free cooking guide with voice directions is incredibly smooth. I cooked a flawless dinner without touching my screen once!" },
+                { name: "CHEF BROCOLINI", role: "Head Kitchen Assistant", text: "I make sure no healthy greens are left forgotten in your crisper drawer! Plus, my custom recipes are 100% kid-approved." }
               ].map((t, i) => (
-                <div key={i} className="bg-white p-10 rounded-[3rem] shadow-premium space-y-6 border border-primary/5 hover:-translate-y-2 transition-transform duration-500">
-                  <div className="flex text-secondary">
+                <div 
+                  key={i} 
+                  className={cn(
+                    "p-10 rounded-[3rem] shadow-premium space-y-6 border transition-all duration-500 hover:-translate-y-2 relative overflow-hidden group",
+                    t.name === "CHEF BROCOLINI" 
+                      ? "bg-green-50/45 border-green-500/20 hover:border-green-500/40 hover:shadow-[0_20px_50px_rgba(34,197,94,0.12)]" 
+                      : "bg-white border-primary/5 hover:border-primary/20"
+                  )}
+                >
+                  <div className={cn("flex", t.name === "CHEF BROCOLINI" ? "text-green-500" : "text-secondary")}>
                     {[1,2,3,4,5].map(s => <Star key={s} className="w-4 h-4 fill-current" />)}
                   </div>
                   <p className="text-lg font-medium italic text-muted-foreground">"{t.text}"</p>
-                  <div>
-                    <p className="font-black text-foreground">{t.name}</p>
-                    <p className="text-sm text-primary font-bold">{t.role}</p>
+                  <div className="flex items-center gap-4 pt-2">
+                    {t.name === "CHEF BROCOLINI" ? (
+                      <div className="w-12 h-12 rounded-2xl bg-green-500/10 border border-green-500/25 overflow-hidden flex items-center justify-center p-1 shrink-0 rotate-3 group-hover:rotate-12 transition-transform duration-300">
+                        <img src="/brocolini.png" alt="Chef Brocolini" className="w-full h-full object-contain" />
+                      </div>
+                    ) : null}
+                    <div>
+                      <p className="font-black text-foreground">{t.name}</p>
+                      <p className={cn("text-sm font-bold", t.name === "CHEF BROCOLINI" ? "text-green-600" : "text-primary")}>{t.role}</p>
+                    </div>
                   </div>
                 </div>
               ))}
