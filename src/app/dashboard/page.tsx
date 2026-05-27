@@ -1201,8 +1201,8 @@ export default function DashboardPage() {
       <div className="max-w-7xl mx-auto space-y-12">
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 bg-white p-8 rounded-[3rem] shadow-premium border border-primary/5">
           <Link href="/" className="flex items-center gap-6 group cursor-pointer select-none">
-            <div className="p-4 bg-primary rounded-3xl shadow-xl shadow-primary/20 group-hover:rotate-6 transition-all duration-500">
-              <ChefHat className="text-white w-10 h-10" />
+            <div className="w-18 h-18 rounded-3xl overflow-hidden shadow-xl shadow-primary/20 group-hover:rotate-6 transition-all duration-500">
+              <img src="/logo.png" alt="COOKER Logo" className="w-full h-full object-cover" />
             </div>
             <div>
               <h1 className="text-4xl font-black text-foreground tracking-tight italic group-hover:text-primary transition-colors duration-300">COOKER</h1>

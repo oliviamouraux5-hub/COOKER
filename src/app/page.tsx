@@ -12,8 +12,8 @@ export default function LandingPage() {
       {/* Premium Navbar */}
       <header className="px-6 lg:px-12 h-24 flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-xl z-50 border-b border-primary/10">
         <Link className="flex items-center gap-2 group" href="/">
-          <div className="p-2 bg-primary rounded-xl group-hover:rotate-12 transition-transform">
-            <ChefHat className="h-6 w-6 text-white" />
+          <div className="w-10 h-10 rounded-xl overflow-hidden border border-primary/10 group-hover:rotate-6 transition-transform">
+            <img src="/logo.png" alt="COOKER Logo" className="w-full h-full object-cover" />
           </div>
           <span className="text-2xl font-heading font-black tracking-tight text-foreground">COOKER</span>
         </Link>
@@ -243,13 +243,40 @@ export default function LandingPage() {
             <div className="relative z-10 space-y-6">
               <h2 className="text-5xl lg:text-7xl font-black text-white leading-tight">Ready to start your <br/> <span className="text-black/20">culinary adventure?</span></h2>
               <p className="text-white/80 text-xl max-w-xl mx-auto font-medium">Join thousands of chefs today and turn your fridge into a gourmet kitchen.</p>
-              <div className="pt-8">
+              <div className="pt-8 flex flex-col items-center gap-8">
                 <Link 
                   href="/signup" 
                   className="bg-white text-primary hover:bg-white/90 px-16 py-8 text-2xl rounded-[2rem] shadow-2xl font-black inline-flex items-center transition-all hover:scale-105"
                 >
                   Join COOKER Now <ArrowRight className="ml-3 w-8 h-8" />
                 </Link>
+
+                <div className="pt-4 space-y-4">
+                  <p className="text-white/60 uppercase tracking-widest text-[11px] font-black">Coming Soon to Mobile</p>
+                  <div className="flex flex-wrap justify-center gap-4">
+                    {/* App Store Badge */}
+                    <div className="flex items-center gap-3 bg-black text-white px-5 py-3 rounded-2xl border border-white/15 select-none opacity-80 hover:opacity-100 transition-opacity">
+                      <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-.96.04-2.13.64-2.82 1.45-.6.69-1.12 1.84-.98 2.94.1.8.8 1.92 1.8 2.67.1-.07.1-.07.1-.07.69-.58 1.22-1.37.91-2.93z" />
+                      </svg>
+                      <div className="text-left">
+                        <p className="text-[10px] uppercase font-bold tracking-tight text-white/60 leading-none">Download on the</p>
+                        <p className="text-md font-black tracking-tight leading-none">App Store</p>
+                      </div>
+                    </div>
+
+                    {/* Google Play Badge */}
+                    <div className="flex items-center gap-3 bg-black text-white px-5 py-3 rounded-2xl border border-white/15 select-none opacity-80 hover:opacity-100 transition-opacity">
+                      <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                        <path d="M5 3.14a1.68 1.68 0 0 0-.35 1.12v15.48a1.68 1.68 0 0 0 .35 1.12l.07.07L14.7 12.2l-.07-.07L5.07 3.07zM17.88 9l-3.18 3.18 3.18 3.18.08-.04 3.75-2.13a1.6 1.6 0 0 0 0-2.8zM14.7 12.13L5.07 21.76a1.27 1.27 0 0 0 1.8.18l11.08-6.3zM14.7 12.07L17.95 8.8 6.87 2.5a1.27 1.27 0 0 0-1.8.18z" />
+                      </svg>
+                      <div className="text-left">
+                        <p className="text-[10px] uppercase font-bold tracking-tight text-white/60 leading-none">Get it on</p>
+                        <p className="text-md font-black tracking-tight leading-none">Google Play</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -259,8 +286,8 @@ export default function LandingPage() {
       <footer className="py-12 px-6 border-t border-primary/10 bg-background">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
           <Link className="flex items-center gap-2 group" href="/">
-            <div className="p-2 bg-primary rounded-xl group-hover:rotate-12 transition-transform">
-              <ChefHat className="h-5 w-5 text-white" />
+            <div className="w-8 h-8 rounded-lg overflow-hidden border border-primary/10 group-hover:rotate-12 transition-transform">
+              <img src="/logo.png" alt="COOKER Logo" className="w-full h-full object-cover" />
             </div>
             <span className="text-xl font-heading font-black tracking-tight text-foreground">COOKER</span>
           </Link>
