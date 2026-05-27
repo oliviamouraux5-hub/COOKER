@@ -131,7 +131,7 @@ export default function CookingModePage() {
   const handleCompleteAll = async () => {
     await deductIngredientsFromFridge()
     toast.success("Cooking completed! 🥳")
-    router.push('/dashboard')
+    window.location.href = '/dashboard'
   }
 
   useEffect(() => {

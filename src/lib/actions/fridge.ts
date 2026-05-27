@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { revalidatePath } from 'next/cache'
 
 export interface FridgeItem {
   id: string
@@ -138,6 +139,8 @@ export async function deleteFridgeItem(id: string): Promise<{ success: boolean, 
       throw error
     }
     
+    revalidatePath('/dashboard')
+    revalidatePath('/recipes')
     return { success: true }
   } catch (err: any) {
     console.error('Error deleting fridge item:', err)
