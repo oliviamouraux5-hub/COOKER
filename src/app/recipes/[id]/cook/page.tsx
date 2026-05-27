@@ -77,6 +77,8 @@ export default function CookingModePage() {
       const isDemo = typeof document !== 'undefined' && document.cookie.includes('cooker_session=demo')
       let items: FridgeItem[] = []
       
+      let isLocalStorageUsed = isDemo
+      
       // 1. Fetch current fridge items
       if (isDemo) {
         const local = localStorage.getItem('cooker_fridge_inventory_v2') || '[]'
@@ -88,6 +90,7 @@ export default function CookingModePage() {
         } else {
           const local = localStorage.getItem('cooker_fridge_inventory_v2') || '[]'
           items = JSON.parse(local)
+          isLocalStorageUsed = true
         }
       }
 
@@ -108,13 +111,17 @@ export default function CookingModePage() {
       if (itemsToDelete.length === 0) return
 
       // 3. Deduct/Delete the matched items
-      if (isDemo) {
+      if (isLocalStorageUsed) {
         const remaining = items.filter(item => !itemsToDelete.some(it => it.id === item.id))
         localStorage.setItem('cooker_fridge_inventory_v2', JSON.stringify(remaining))
-      } else {
-        // Delete each natively in Supabase database!
+      }
+      
+      if (!isDemo) {
+        // Delete each natively in Supabase database for any real DB items!
         for (const item of itemsToDelete) {
-          await deleteFridgeItem(item.id)
+          if (item.id && !item.id.startsWith('demo-')) {
+            await deleteFridgeItem(item.id)
+          }
         }
       }
 
