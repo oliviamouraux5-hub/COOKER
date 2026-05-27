@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { ChefHat, ChevronLeft, ChevronRight, CheckCircle2, Timer, Volume2, VolumeX, Star, Camera, Share2, Trophy, Sparkles, X, Sliders, Music, Upload, Play, Pause, ShoppingCart, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
-import { cn } from '@/lib/utils'
+import { cn, ingredientsMatch } from '@/lib/utils'
 import { getFridgeItems, toggleRestockItem, deleteFridgeItem, type FridgeItem } from '@/lib/actions/fridge'
 
 export default function CookingModePage() {
@@ -216,16 +216,7 @@ export default function CookingModePage() {
 
   const isMissing = (item: string) => {
     if (availableWords.length === 0) return true // assume missing until loaded
-    const itemLower = item.toLowerCase()
-    
-    // Robust match: Check if recipe item contains our shelf word,
-    // OR if our shelf word contains/exactly matches the recipe item.
-    const matchesAny = availableWords.some(word => {
-      const cleanWord = word.trim()
-      if (!cleanWord) return false
-      return itemLower.includes(cleanWord) || cleanWord.includes(itemLower)
-    })
-    return !matchesAny
+    return !availableWords.some(word => ingredientsMatch(item, word))
   }
 
   useEffect(() => {

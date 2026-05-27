@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button, buttonVariants } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
+import { cn, ingredientsMatch } from '@/lib/utils'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { ChefHat, ChevronLeft, Heart, Play, Plus, Share2, Timer, Utensils, Volume2, VolumeX, ShoppingBasket, MapPin } from 'lucide-react'
@@ -131,16 +131,7 @@ export default function RecipeDetailsPage() {
 
   const isMissing = (item: string) => {
     if (availableWords.length === 0) return true // assume missing until loaded
-    const itemLower = item.toLowerCase()
-    
-    // Robust match: Check if recipe item contains our shelf word,
-    // OR if our shelf word contains/exactly matches the recipe item.
-    const matchesAny = availableWords.some(word => {
-      const cleanWord = word.trim()
-      if (!cleanWord) return false
-      return itemLower.includes(cleanWord) || cleanWord.includes(itemLower)
-    })
-    return !matchesAny
+    return !availableWords.some(word => ingredientsMatch(item, word))
   }
 
   const speak = (text: string, index: number) => {

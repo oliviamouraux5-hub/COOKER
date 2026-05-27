@@ -6,26 +6,7 @@ import { revalidatePath } from 'next/cache'
 import eliteRecipes from '@/lib/data/elite_recipes.json'
 import { INGREDIENT_MEAL_MAP, MealType } from '@/lib/data/culinary_knowledge'
 
-const IGNORED_MODIFIERS = new Set([
-  'fresh', 'organic', 'baby', 'leaves', 'powder', 'clove', 'cloves', 'unsalted', 'salted',
-  'ground', 'pieces', 'sliced', 'chopped', 'diced', 'minced', 'whole', 'crushed',
-  'large', 'medium', 'small', 'shredded', 'grated', 'dried', 'dry', 'raw', 'cooked',
-  'extra', 'virgin', 'pure', 'natural', 'sweet', 'hot', 'spicy', 'cold'
-])
-
-function ingredientsMatch(recipeIng: string, userIng: string): boolean {
-  const cleanRecipe = recipeIng.toLowerCase().replace(/[^a-z\s]/g, '').trim()
-  const cleanUser = userIng.toLowerCase().replace(/[^a-z\s]/g, '').trim()
-  
-  const recipeTokens = cleanRecipe.split(/\s+/).filter(w => w.length > 2 && !IGNORED_MODIFIERS.has(w))
-  const userTokens = cleanUser.split(/\s+/).filter(w => w.length > 2 && !IGNORED_MODIFIERS.has(w))
-  
-  if (recipeTokens.length === 0 || userTokens.length === 0) {
-    return cleanRecipe.includes(cleanUser) || cleanUser.includes(cleanRecipe)
-  }
-  
-  return recipeTokens.some(rt => userTokens.some(ut => rt.includes(ut) || ut.includes(rt)))
-}
+import { ingredientsMatch } from '@/lib/utils'
 
 export async function generateRecipes(values: FridgeFormValues & { selectedHeroes?: string[], manualIngredients?: string }) {
   // Validate input
@@ -44,8 +25,8 @@ export async function generateRecipes(values: FridgeFormValues & { selectedHeroe
   // Guest/Demo Mode authorized by default for recipe searches
 
   // 0. Build the total ingredient pool (Fridge + Pantry)
-  const fridgeWords = (ingredients || '').toLowerCase().split(/[\s,]+/).filter(w => w.length > 2)
-  const pantryWords = pantry ? Object.keys(pantry).filter(k => pantry[k]).flatMap(k => k.toLowerCase().split(' ')) : []
+  const fridgeWords = (ingredients || '').toLowerCase().split(',').map(w => w.trim()).filter(w => w.length > 2)
+  const pantryWords = pantry ? Object.keys(pantry).filter(k => pantry[k]).map(k => k.toLowerCase().trim()) : []
   const totalPool = Array.from(new Set([...fridgeWords, ...pantryWords]))
 
   // 1. Explicit AI Creative Mode - Quality over Quantity
