@@ -13,7 +13,10 @@ export const IGNORED_MODIFIERS = new Set([
   'juice', 'oil', 'sauce', 'cream', 'wine', 'water', 'extract', 'flavor', 'flavored',
   'package', 'box', 'can', 'cans', 'bottle', 'bottles', 'cup', 'cups', 'ounce', 'ounces',
   'pound', 'pounds', 'taste', 'additional', 'style', 'tbsp', 'tsp', 'tablespoon', 'tablespoons',
-  'teaspoon', 'teaspoons'
+  'teaspoon', 'teaspoons',
+  'green', 'red', 'white', 'black', 'blue', 'yellow', 'orange', 'purple', 'pink', 'brown', 'gold',
+  'sour', 'bitter', 'kosher', 'sea', 'pickled', 'canned', 'frozen', 'vegetable', 'vegetables',
+  'fruit', 'fruits', 'meat', 'meats'
 ])
 
 export function wordsArePluralOfEachOther(w1: string, w2: string): boolean {
