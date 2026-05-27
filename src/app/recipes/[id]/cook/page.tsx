@@ -97,11 +97,8 @@ export default function CookingModePage() {
         const ingName = ing.item.toLowerCase().trim()
         if (!ingName) return
 
-        // Look for matching fridge item (robust matches like "Salmon fillet" matches "Fresh Salmon")
-        const match = items.find(item => {
-          const itemName = item.name.toLowerCase().trim()
-          return ingName.includes(itemName) || itemName.includes(ingName)
-        })
+        // Look for matching fridge item using our mathematically perfect global matching rules!
+        const match = items.find(item => ingredientsMatch(ing.item, item.name))
 
         if (match && !itemsToDelete.some(it => it.id === match.id)) {
           itemsToDelete.push(match)
