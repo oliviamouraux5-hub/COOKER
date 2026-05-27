@@ -1637,7 +1637,7 @@ export default function DashboardPage() {
                 {/* Left Sidebar */}
                 <div className="lg:col-span-4 space-y-6">
                   {/* AI Chef Assistant Form Panel */}
-                  <Card className="border-none shadow-premium bg-white p-6 rounded-[2.5rem] border border-primary/5 space-y-6">
+                  <Card className="border-none shadow-premium bg-white p-5 rounded-[2.5rem] border border-primary/5 space-y-3.5">
                     <div>
                       <h3 className="font-black text-xl text-foreground flex items-center gap-2">
                         <ChefHat className="w-6 h-6 text-primary" />
@@ -1646,10 +1646,23 @@ export default function DashboardPage() {
                       <p className="text-[10px] text-muted-foreground/60 font-bold uppercase tracking-wider mt-0.5">Customize your culinary request</p>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       {/* Ingredients Input Panel */}
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wider ml-1">Ingredients</label>
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between px-1">
+                          <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wider">Ingredients</label>
+                          {((watch('ingredients') || '').split(',').map(i => i.trim()).filter(i => i.length > 0)).length > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => setValue('ingredients', '')}
+                              className="text-[9px] font-black uppercase tracking-wider text-red-500 hover:text-red-750 transition-colors flex items-center gap-1 active:scale-95 duration-150 cursor-pointer"
+                              title="Clear all ingredients"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                              Clear All
+                            </button>
+                          )}
+                        </div>
                         
                         <div className="bg-muted/30 border border-muted-foreground/10 rounded-[2rem] p-3.5 focus-within:bg-white focus-within:border-primary/30 focus-within:ring-4 focus-within:ring-primary/5 transition-all duration-300 min-h-[110px] flex flex-col justify-between relative group">
                           
@@ -1693,22 +1706,6 @@ export default function DashboardPage() {
                               }}
                               className="flex-1 bg-transparent border-none text-xs font-semibold outline-none text-foreground placeholder:text-muted-foreground/45 w-full"
                             />
-                            
-                            <button
-                              type="button"
-                              onClick={() => document.getElementById('discover-fridge-upload')?.click()}
-                              className="p-2 rounded-xl text-muted-foreground/75 hover:text-primary hover:bg-primary/10 transition-all flex items-center justify-center cursor-pointer"
-                              title="Quick Scan Fridge Picture"
-                            >
-                              <Camera className="w-4 h-4" />
-                            </button>
-                            <input
-                              id="discover-fridge-upload"
-                              type="file"
-                              accept="image/*"
-                              className="hidden"
-                              onChange={handleFridgeScan}
-                            />
                           </div>
 
                           {/* Autocomplete Suggestions Menu */}
@@ -1737,15 +1734,32 @@ export default function DashboardPage() {
                         </div>
                       </div>
 
-                      {/* Sync Fridge Items Toggle */}
-                      <div className="flex flex-col p-3 bg-orange-50/40 border border-orange-100 rounded-2xl gap-3">
+                      {/* High-visibility Dedicated Camera Scan Button */}
+                      <button
+                        type="button"
+                        onClick={() => document.getElementById('discover-fridge-upload')?.click()}
+                        className="w-full flex items-center justify-center gap-2.5 py-3.5 px-6 bg-gradient-to-r from-primary to-orange-500 hover:from-primary/95 hover:to-orange-500/95 text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-premium transition-all duration-300 transform hover:scale-[1.02] active:scale-95 cursor-pointer relative overflow-hidden group border-none"
+                      >
+                        <Camera className="w-5 h-5 text-white animate-pulse" />
+                        <span>Scan Fridge Picture</span>
+                      </button>
+                      <input
+                        id="discover-fridge-upload"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleFridgeScan}
+                      />
+
+                      {/* Sync Fridge Items Toggle Section */}
+                      <div className="flex flex-col p-4.5 bg-orange-50/30 border border-orange-100/70 rounded-3xl shadow-sm space-y-3.5">
                         <div className="flex items-center justify-between">
-                          <div className="space-y-0.5">
+                          <div className="space-y-0.5 pr-2">
                             <span className="block font-black text-[10px] text-orange-950 uppercase tracking-wider flex items-center gap-1.5">
-                              <Sparkles className="w-3 h-3 text-orange-500" />
-                              Sync Fridge Items
+                              <Sparkles className="w-3.5 h-3.5 text-orange-500" />
+                              Sync Fridge Cabinet
                             </span>
-                            <span className="block text-[9px] text-orange-600/80 font-bold">Chef automatically reads cabinet drawer</span>
+                            <span className="block text-[9px] text-orange-600/80 font-bold leading-tight">Chef automatically reads active drawer items</span>
                           </div>
                           <label className="relative inline-flex items-center cursor-pointer">
                             <input
@@ -1759,19 +1773,19 @@ export default function DashboardPage() {
                         </div>
 
                         {includeFridgeInSearch && fridgeItems.length > 0 && (
-                          <div className="pt-2 border-t border-orange-200/50 space-y-2">
+                          <div className="pt-2 border-t border-orange-100 space-y-3">
                             <button
                               type="button"
                               onClick={() => setShowSyncedList(!showSyncedList)}
-                              className="w-full text-[8px] font-black uppercase tracking-wider text-orange-700 hover:text-orange-850 transition-colors flex items-center justify-center gap-1.5 py-1.5 px-3 bg-orange-100/40 rounded-xl border border-orange-200/20 active:scale-95 duration-200"
+                              className="w-full text-[8.5px] font-black uppercase tracking-wider text-orange-800 hover:text-orange-950 transition-colors flex items-center justify-center gap-1.5 py-2 px-3.5 bg-orange-100/50 hover:bg-orange-100 rounded-xl border border-orange-200/40 active:scale-95 duration-200"
                             >
-                              {showSyncedList ? "Hide Synced Fridge Items" : `Show Synced Fridge Items (${fridgeItems.length})`}
+                              {showSyncedList ? "Hide Synced Cabinet Items" : `Show Synced Cabinet Items (${fridgeItems.length})`}
                             </button>
                             
                             {showSyncedList && (
                               <div className="flex flex-wrap gap-1.5 max-h-[160px] overflow-y-auto pr-1 pt-1 animate-in slide-in-from-top-1 duration-200">
                                 {fridgeItems.map(item => (
-                                  <span key={`show-sync-${item.id}`} className="px-2.5 py-1 bg-orange-100 text-orange-900 border border-orange-200/30 rounded-xl text-[9px] font-bold">
+                                  <span key={`show-sync-${item.id}`} className="px-3 py-1.5 bg-white text-orange-900 border border-orange-200/50 rounded-xl text-[9px] font-black uppercase tracking-wider shadow-sm hover:scale-[1.03] transition-all">
                                     {item.name}
                                   </span>
                                 ))}
