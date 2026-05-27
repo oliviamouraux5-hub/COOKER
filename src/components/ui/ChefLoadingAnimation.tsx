@@ -10,9 +10,13 @@ export default function ChefLoadingAnimation() {
         {/* Glowing Background Ring */}
         <div className="absolute inset-0 bg-primary/10 rounded-full blur-3xl animate-pulse" />
         
-        {/* The Fridge (Center) */}
-        <div className="relative z-10 p-8 bg-white/80 backdrop-blur-xl rounded-[2.5rem] shadow-premium border-4 border-white animate-bounce-slow">
-          <Refrigerator className="w-20 h-20 text-primary" strokeWidth={1.5} />
+        {/* Brocolini Mascot (Center) */}
+        <div className="relative z-10 p-4 bg-white/90 backdrop-blur-xl rounded-[2.5rem] shadow-premium border-4 border-white animate-bounce-slow w-32 h-32 flex items-center justify-center overflow-hidden">
+          <img 
+            src="/brocolini.png" 
+            alt="Chef Brocolini" 
+            className="w-full h-full object-contain transform scale-110"
+          />
         </div>
 
         {/* Orbiting Ingredients */}
@@ -46,7 +50,7 @@ export default function ChefLoadingAnimation() {
           Whipping up something magical
         </h3>
         <p className="text-muted-foreground font-bold animate-pulse text-lg">
-          Letting the chef take over...
+          Chef Brocolini is crafting your custom gourmet recipe...
         </p>
       </div>
 

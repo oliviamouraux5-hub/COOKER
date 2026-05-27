@@ -2580,16 +2580,17 @@ export default function DashboardPage() {
             <div className="absolute -top-12 -right-12 w-32 h-32 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/15 transition-all duration-500" />
             
             {/* Step Icon & Header */}
-            <div className="flex items-start gap-4">
-              <div className="p-3.5 bg-primary/10 rounded-2xl text-2xl border border-primary/20 animate-pulse">
-                {onboardingStep === 1 && '🧑‍🍳'}
-                {onboardingStep === 2 && '🥬'}
-                {onboardingStep === 3 && '✨'}
-                {onboardingStep === 4 && '🛒'}
+            <div className="flex items-center gap-4">
+              <div className="relative shrink-0 w-16 h-16 rounded-2xl bg-primary/5 border border-primary/10 overflow-hidden flex items-center justify-center p-1">
+                <img 
+                  src="/brocolini.png" 
+                  alt="Chef Assistant Brocolini" 
+                  className="w-full h-full object-contain transform hover:scale-110 transition-transform duration-300"
+                />
               </div>
               <div className="space-y-1 min-w-0">
                 <span className="text-[10px] font-black uppercase tracking-widest text-primary/70">
-                  Step {onboardingStep} of 4
+                  Assistant Brocolini • Step {onboardingStep} of 4
                 </span>
                 <h4 className="font-black text-lg text-foreground leading-tight">
                   {onboardingStep === 1 && "Welcome to COOKER!"}
@@ -2602,10 +2603,10 @@ export default function DashboardPage() {
 
             {/* Description Text */}
             <p className="text-xs font-semibold text-muted-foreground leading-relaxed">
-              {onboardingStep === 1 && "Welcome, Chef! Cooker is your intelligent, AI-powered personal chef assistant. Let's take a quick 1-minute tour to get you ready to cook delicious meals tailored perfectly to what you already have in stock!"}
-              {onboardingStep === 2 && "Let us know what ingredients you have! You can manually place ingredients on your Refrigerator Doors and crispers, or upload a photo of your physical fridge to let our AI scan the shelves automatically."}
-              {onboardingStep === 3 && "Once your cabinet has ingredients, head to Discover! Our elite AI chef persona engines will craft custom gourmet recipes matched perfectly to your cabinet stock and dietary preferences."}
-              {onboardingStep === 4 && "Missing an ingredient for a recipe? Simply click on any ingredient to view real-time maps showing nearby grocery stores that have it in stock. You'll always find what you need!"}
+              {onboardingStep === 1 && "Hi there! I'm Brocolini, your kitchen assistant. 🧑‍🍳 Cooker is your intelligent, AI-powered personal chef! Let's take a quick 1-minute tour to get you ready to cook beautiful meals!"}
+              {onboardingStep === 2 && "First, stock your fridge! You can manually add ingredients on your Refrigerator Doors and crispers, or snap a photo of your physical fridge and I'll scan the shelves automatically!"}
+              {onboardingStep === 3 && "Once stocked, click Discover! Our smart chef engines will instantly formulate customized step-by-step recipes matched perfectly to your cabinet stock and dietary preferences."}
+              {onboardingStep === 4 && "Missing an ingredient? Simply click on any item to view my interactive grocery map showing nearby shops that have it in stock. Let's get cooking! 🚀"}
             </p>
 
             {/* Pagination dots & Navigation actions */}
