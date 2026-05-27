@@ -104,7 +104,10 @@ export default function CookingModePage() {
         const match = items.find(item => ingredientsMatch(ing.item, item.name))
 
         if (match && !itemsToDelete.some(it => it.id === match.id)) {
-          itemsToDelete.push(match)
+          // Keep dry pantry closet staples (like olive oil or spices) in the cabinet, only deduct perishable refrigerated items!
+          if (match.category?.toLowerCase().trim() !== 'pantry') {
+            itemsToDelete.push(match)
+          }
         }
       })
 
