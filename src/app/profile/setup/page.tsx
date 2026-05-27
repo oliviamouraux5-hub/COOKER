@@ -29,6 +29,7 @@ export default function ProfileSetupPage() {
     try {
       document.cookie = 'cooker_session=; Max-Age=0; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;'
       localStorage.removeItem('cooker_staged_profile')
+      localStorage.removeItem('cooker_onboarding_completed')
       await supabase.auth.signOut()
       toast.success("Logged out successfully! See you soon, Chef! 👋")
       window.location.href = '/'
