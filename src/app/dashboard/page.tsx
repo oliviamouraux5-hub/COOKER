@@ -224,6 +224,7 @@ export default function DashboardPage() {
   const supabase = createClient() as any
   const [userName, setUserName] = useState<string>('')
   const [userAvatar, setUserAvatar] = useState<string>('')
+  const [tagInputValue, setTagInputValue] = useState('')
 
   // Hero centerpiece ingredient input
   const [heroInput, setHeroInput] = useState('')
@@ -776,8 +777,7 @@ export default function DashboardPage() {
     return lastPart ? lastPart.trimStart() : ''
   }
 
-  const activeTypedWord = getActiveTypedWord()
-  const activeTypedQuery = activeTypedWord.trim().toLowerCase()
+  const activeTypedQuery = tagInputValue.trim().toLowerCase()
 
   const STAPLE_INGREDIENTS = [
     // Proteins
@@ -803,6 +803,26 @@ export default function DashboardPage() {
         item.toLowerCase() !== activeTypedQuery
       ).slice(0, 5)
     : []
+
+  const handleAddTag = (val: string) => {
+    const trimmed = val.trim()
+    if (!trimmed) return
+    
+    const itemsToAdd = trimmed.split(',').map(i => i.trim()).filter(i => i.length > 0)
+    const currentList = watch('ingredients') || ''
+    const currentTags = currentList.split(',').map(i => i.trim()).filter(i => i.length > 0)
+    
+    const newTags = Array.from(new Set([...currentTags, ...itemsToAdd]))
+    setValue('ingredients', newTags.join(', '))
+    setTagInputValue('')
+  }
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    const currentList = watch('ingredients') || ''
+    const currentTags = currentList.split(',').map(i => i.trim()).filter(i => i.length > 0)
+    const newTags = currentTags.filter(t => t.toLowerCase() !== tagToRemove.toLowerCase())
+    setValue('ingredients', newTags.join(', '))
+  }
 
   const handleSelectMainSuggestion = (sug: string) => {
     const parts = (watchedIngredients || '').split(',')
@@ -1628,55 +1648,88 @@ export default function DashboardPage() {
 
                     <div className="space-y-4">
                       {/* Ingredients Input Panel */}
-                      <div className="space-y-1.5">
+                      <div className="space-y-2">
                         <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wider ml-1">Ingredients</label>
-                        <div className="relative">
-                          <textarea
-                            placeholder="Search or add custom ingredients... (e.g. Tomatoes, Salmon)"
-                            {...register('ingredients')}
-                            rows={3}
-                            className="w-full bg-muted/40 border border-muted-foreground/10 rounded-2xl pl-5 pr-12 py-3 text-xs font-semibold outline-none focus:bg-white focus:border-primary/40 focus:ring-2 focus:ring-primary/5 transition-all text-foreground resize-none"
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter' && !e.shiftKey) {
-                                e.preventDefault()
-                                handleSubmit(onSuggest)()
-                              }
-                            }}
-                          />
+                        
+                        <div className="bg-muted/30 border border-muted-foreground/10 rounded-[2rem] p-3.5 focus-within:bg-white focus-within:border-primary/30 focus-within:ring-4 focus-within:ring-primary/5 transition-all duration-300 min-h-[110px] flex flex-col justify-between relative group">
                           
+                          {/* Tags Grid */}
+                          <div className="flex flex-wrap gap-1.5 mb-2 max-h-[180px] overflow-y-auto pr-1">
+                            {((watch('ingredients') || '').split(',').map(i => i.trim()).filter(i => i.length > 0)).map((tag, idx) => (
+                              <span 
+                                key={`tag-${idx}`} 
+                                className="inline-flex items-center gap-1 bg-primary/10 text-primary hover:bg-primary/15 pl-2.5 pr-1.5 py-1 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all animate-in zoom-in-95 duration-200"
+                              >
+                                {tag}
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveTag(tag)}
+                                  className="hover:bg-primary/25 text-primary rounded-full p-0.5 transition-colors cursor-pointer w-4 h-4 flex items-center justify-center font-bold"
+                                >
+                                  &times;
+                                </button>
+                              </span>
+                            ))}
+                            
+                            {((watch('ingredients') || '').split(',').map(i => i.trim()).filter(i => i.length > 0)).length === 0 && (
+                              <span className="text-[11px] text-muted-foreground/50 font-medium italic select-none py-1 pl-1">
+                                Search or type ingredients...
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Text Input Row */}
+                          <div className="flex items-center gap-2 mt-2 pt-2 border-t border-muted/50">
+                            <input
+                              type="text"
+                              placeholder="Add ingredients... (e.g. Tomato)"
+                              value={tagInputValue}
+                              onChange={(e) => setTagInputValue(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ',') {
+                                  e.preventDefault()
+                                  handleAddTag(tagInputValue)
+                                }
+                              }}
+                              className="flex-1 bg-transparent border-none text-xs font-semibold outline-none text-foreground placeholder:text-muted-foreground/45 w-full"
+                            />
+                            
+                            <button
+                              type="button"
+                              onClick={() => document.getElementById('discover-fridge-upload')?.click()}
+                              className="p-2 rounded-xl text-muted-foreground/75 hover:text-primary hover:bg-primary/10 transition-all flex items-center justify-center cursor-pointer"
+                              title="Quick Scan Fridge Picture"
+                            >
+                              <Camera className="w-4 h-4" />
+                            </button>
+                            <input
+                              id="discover-fridge-upload"
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={handleFridgeScan}
+                            />
+                          </div>
+
+                          {/* Autocomplete Suggestions Menu */}
                           {mainSearchSuggestions.length > 0 && (
-                            <div className="absolute z-30 left-0 right-0 mt-1 bg-white border border-orange-100 rounded-2xl shadow-xl py-1.5 max-h-[160px] overflow-y-auto animate-in fade-in slide-in-from-top-1 duration-150">
+                            <div className="absolute z-30 left-0 right-0 top-full mt-2 bg-white border border-muted-foreground/10 rounded-2xl shadow-xl py-1.5 max-h-[160px] overflow-y-auto animate-in fade-in slide-in-from-top-1 duration-150">
                               {mainSearchSuggestions.map((sug, idx) => (
                                 <button
                                   key={`main-sug-${idx}`}
                                   type="button"
-                                  onClick={() => handleSelectMainSuggestion(sug)}
-                                  className="w-full text-left px-4 py-2 text-[11px] font-bold text-orange-950 hover:bg-orange-50 hover:text-orange-600 transition-colors"
+                                  onClick={() => handleAddTag(sug)}
+                                  className="w-full text-left px-4 py-2 text-[11px] font-bold text-foreground hover:bg-primary/5 hover:text-primary transition-colors flex items-center justify-between"
                                 >
                                   <span>{sug}</span>
+                                  <span className="text-[9px] text-muted-foreground/50 font-semibold">Add +</span>
                                 </button>
                               ))}
                             </div>
                           )}
 
-                          <button
-                            type="button"
-                            onClick={() => document.getElementById('discover-fridge-upload')?.click()}
-                            className="absolute right-3 bottom-3 p-2.5 rounded-xl text-muted-foreground/70 hover:text-primary hover:bg-primary/10 transition-all flex items-center justify-center cursor-pointer"
-                            title="Quick Scan Fridge Picture"
-                          >
-                            <Camera className="w-5 h-5" />
-                          </button>
-                          <input
-                            id="discover-fridge-upload"
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={handleFridgeScan}
-                          />
-
                           {isScanning && (
-                            <div className="absolute inset-0 bg-white/95 backdrop-blur-md rounded-2xl flex items-center justify-center animate-in fade-in duration-300 z-10 px-4">
+                            <div className="absolute inset-0 bg-white/95 backdrop-blur-md rounded-[2rem] flex items-center justify-center animate-in fade-in duration-300 z-10 px-4">
                               <Loader2 className="w-4 h-4 text-primary animate-spin mr-2" />
                               <span className="text-[11px] font-black text-primary uppercase tracking-widest animate-pulse">{scanStatus || 'Analyzing Photo...'}</span>
                             </div>
