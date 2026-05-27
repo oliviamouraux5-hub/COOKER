@@ -778,7 +778,21 @@ export async function getHistory() {
     .order('created_at', { ascending: false })
 
   if (error) return { error: error.message }
-  return { recipes: data }
+
+  // Filter out duplicates by title (keeping the most recent one since they are sorted DESC)
+  const uniqueRecipes: any[] = []
+  const titlesSeen = new Set<string>()
+  if (data) {
+    for (const r of data as any[]) {
+      const normalizedTitle = r.title?.trim().toLowerCase()
+      if (normalizedTitle && !titlesSeen.has(normalizedTitle)) {
+        titlesSeen.add(normalizedTitle)
+        uniqueRecipes.push(r)
+      }
+    }
+  }
+
+  return { recipes: uniqueRecipes }
 }
 
 export async function getFavorites() {
@@ -819,5 +833,19 @@ export async function getFavorites() {
     .order('created_at', { ascending: false })
 
   if (error) return { error: error.message }
-  return { recipes: data }
+
+  // Filter out duplicates by title (keeping the most recent one since they are sorted DESC)
+  const uniqueRecipes: any[] = []
+  const titlesSeen = new Set<string>()
+  if (data) {
+    for (const r of data as any[]) {
+      const normalizedTitle = r.title?.trim().toLowerCase()
+      if (normalizedTitle && !titlesSeen.has(normalizedTitle)) {
+        titlesSeen.add(normalizedTitle)
+        uniqueRecipes.push(r)
+      }
+    }
+  }
+
+  return { recipes: uniqueRecipes }
 }
