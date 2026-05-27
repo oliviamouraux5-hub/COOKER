@@ -1734,22 +1734,27 @@ export default function DashboardPage() {
                         </div>
                       </div>
 
-                      {/* High-visibility Dedicated Camera Scan Button */}
-                      <button
-                        type="button"
-                        onClick={() => document.getElementById('discover-fridge-upload')?.click()}
-                        className="w-full flex items-center justify-center gap-2.5 py-3.5 px-6 bg-gradient-to-r from-primary to-orange-500 hover:from-primary/95 hover:to-orange-500/95 text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-premium transition-all duration-300 transform hover:scale-[1.02] active:scale-95 cursor-pointer relative overflow-hidden group border-none"
-                      >
-                        <Camera className="w-5 h-5 text-white animate-pulse" />
-                        <span>Scan Fridge Picture</span>
-                      </button>
-                      <input
-                        id="discover-fridge-upload"
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleFridgeScan}
-                      />
+                      {/* Compact Camera Scan Action */}
+                      <div className="space-y-1">
+                        <button
+                          type="button"
+                          onClick={() => document.getElementById('discover-fridge-upload')?.click()}
+                          className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-orange-100 hover:bg-orange-200 text-orange-950 font-black text-[10px] uppercase tracking-wider rounded-xl transition-all active:scale-[0.98] cursor-pointer border border-orange-200/20 shadow-sm"
+                        >
+                          <Camera className="w-3.5 h-3.5 text-orange-600 animate-pulse" />
+                          <span>Scan New Groceries or Receipt</span>
+                        </button>
+                        <span className="block text-[8.5px] text-muted-foreground/60 text-center font-bold">
+                          Quick snap new purchases or items not in your cabinet yet!
+                        </span>
+                        <input
+                          id="discover-fridge-upload"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleFridgeScan}
+                        />
+                      </div>
 
                       {/* Sync Fridge Items Toggle Section */}
                       <div className="flex flex-col p-4.5 bg-orange-50/30 border border-orange-100/70 rounded-3xl shadow-sm space-y-3.5">
