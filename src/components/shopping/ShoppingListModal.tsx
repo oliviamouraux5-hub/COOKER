@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Check, Loader2, MapPin, Navigation, ShoppingBasket, Store, Trash2, X } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn, ingredientsMatch } from '@/lib/utils'
 import { toast } from 'sonner'
 import { getFridgeItems, type FridgeItem } from '@/lib/actions/fridge'
 
@@ -122,14 +122,7 @@ export default function ShoppingListModal({ isOpen, onClose, items }: { isOpen: 
 
   const isMissing = (item: string) => {
     if (availableWords.length === 0) return true // assume missing until loaded to avoid race condition!
-    const itemLower = item.toLowerCase()
-    
-    const matchesAny = availableWords.some(word => {
-      const cleanWord = word.trim()
-      if (!cleanWord) return false
-      return itemLower.includes(cleanWord) || cleanWord.includes(itemLower)
-    })
-    return !matchesAny
+    return !availableWords.some(word => ingredientsMatch(item, word))
   }
 
   useEffect(() => {

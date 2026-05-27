@@ -16,6 +16,21 @@ export const IGNORED_MODIFIERS = new Set([
   'teaspoon', 'teaspoons'
 ])
 
+export function wordsArePluralOfEachOther(w1: string, w2: string): boolean {
+  if (w1 === w2) return true
+  
+  // Plural checks (e.g. s, es)
+  if (w1 === w2 + 's' || w2 === w1 + 's') return true
+  if (w1 === w2 + 'es' || w2 === w1 + 'es') return true
+  
+  // y/ies plural checks (e.g. strawberry/strawberries)
+  const cleanW1 = w1.replace(/ies$/, 'y')
+  const cleanW2 = w2.replace(/ies$/, 'y')
+  if (cleanW1 === cleanW2) return true
+  
+  return false
+}
+
 export function ingredientsMatch(recipeIng: string, userIng: string): boolean {
   const cleanRecipe = recipeIng.toLowerCase().replace(/[^a-z\s]/g, '').trim()
   const cleanUser = userIng.toLowerCase().replace(/[^a-z\s]/g, '').trim()
@@ -27,8 +42,8 @@ export function ingredientsMatch(recipeIng: string, userIng: string): boolean {
   
   if (recipeTokens.length === 0 || userTokens.length === 0) {
     if (cleanRecipe.length <= 2 || cleanUser.length <= 2) return false
-    return cleanRecipe.includes(cleanUser) || cleanUser.includes(cleanRecipe)
+    return wordsArePluralOfEachOther(cleanRecipe, cleanUser)
   }
   
-  return recipeTokens.some(rt => userTokens.some(ut => rt.includes(ut) || ut.includes(rt)))
+  return recipeTokens.some(rt => userTokens.some(ut => wordsArePluralOfEachOther(rt, ut)))
 }
