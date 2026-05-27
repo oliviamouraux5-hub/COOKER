@@ -20,10 +20,13 @@ export function ingredientsMatch(recipeIng: string, userIng: string): boolean {
   const cleanRecipe = recipeIng.toLowerCase().replace(/[^a-z\s]/g, '').trim()
   const cleanUser = userIng.toLowerCase().replace(/[^a-z\s]/g, '').trim()
   
+  if (!cleanRecipe || !cleanUser) return false
+  
   const recipeTokens = cleanRecipe.split(/\s+/).filter(w => w.length > 2 && !IGNORED_MODIFIERS.has(w))
   const userTokens = cleanUser.split(/\s+/).filter(w => w.length > 2 && !IGNORED_MODIFIERS.has(w))
   
   if (recipeTokens.length === 0 || userTokens.length === 0) {
+    if (cleanRecipe.length <= 2 || cleanUser.length <= 2) return false
     return cleanRecipe.includes(cleanUser) || cleanUser.includes(cleanRecipe)
   }
   
